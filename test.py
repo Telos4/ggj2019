@@ -7,5 +7,6 @@ pygame.init()
 pygame.mixer.music.load("Music/Hintergrundmusikfertig.ogg")
 img = pygame.image.load("Art/generic_item_small.png")
 print(img.get_rect().size)
+pygame.mixer.music.play()
 time.sleep(5)
 
