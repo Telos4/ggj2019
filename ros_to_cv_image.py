@@ -24,6 +24,9 @@ import CarConstants
 import ControllerConstants
 from ValueConverter import linear_converter
 
+
+
+
 # pygame setup
 pygame.init()
 pygame.font.init()
@@ -165,9 +168,10 @@ class Car:
         if mem.type == "item":
             if mem.id == Battery_id:
                 self.battery_capacity += 10000
+                self.battery_charge += 10000
                 print("increased capacity")
             if mem.id == Solar_Pan_id:
-                self.battery_capacity += 10000
+                self.charging_possible = True
                 print("charging now possible")
 
         mem.event(pos)
@@ -292,6 +296,8 @@ class Game:
         if self.ic.light is not None:
             light_text = myfont.render("Light = {}".format(self.ic.light), False, (0, 0, 0))
             screen.blit(light_text, (260, 600))
+            if self.car.charging_possible and self.ic.light > Light_threshold:
+                self.car.battery_charge += 10
 
         pygame.display.update()
 

@@ -9,3 +9,4 @@ MAX_SPEED = 1550
 
 MIN_SPEED_DEGREE = -180
 MAX_SPEED_DEGREE = 0
+Light_threshold = 180
