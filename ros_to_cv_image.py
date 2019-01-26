@@ -30,10 +30,14 @@ from ValueConverter import linear_converter
 
 # pygame setup
 pygame.mixer.pre_init()
-pygame.mixer.init(frequency=22050,size=-16,channels = 2,buffer=512)
+pygame.mixer.init()
 pygame.init()
 pygame.font.init()
 pygame.joystick.init()
+
+background_sound = pygame.mixer.Sound("Music/background.ogg")
+pygame.mixer.Channel(1).play(background_sound, loops=-1)
+
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 pygame.display.set_caption("ROS camera stream on Pygame")
 screenheight = 800
@@ -150,7 +154,8 @@ class Marker:
                     img = pygame.image.load("Art/home_not_won.png")
 
         if markerwidth > 100:
-            xscaling = int(4*16./9)
+            x,y = img.get_rect().size
+            xscaling = int(4*x/y)
             yscaling = 4
             if self.type == "item":
                 img = pygame.image.load(pic_dict[self.id])
