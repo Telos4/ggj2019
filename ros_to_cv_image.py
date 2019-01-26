@@ -108,19 +108,19 @@ class image_converter:
         #print(data)
 
 class item:
-    name
-    obtained
-    def __init__(self,name):
+    name = ""
+    obtained = False
+    id = 0
+    def __init__(self,name,id):
         self.name = name
-        obatined=False;
-
+        self.id = id
+        self.obatined=False;
 
 
 class car:
-    items = []
     items_found = []
-    battery_capacity
-    battery_charge
+    battery_capacity = 0
+    battery_charge = 0
     def __init__(cap = 1000):
         self.battery_capacity = cap
         self.battery_charge = cap
