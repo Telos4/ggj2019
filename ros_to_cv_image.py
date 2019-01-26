@@ -217,14 +217,34 @@ class Game:
         in_speed, converted_speed = self.get_speed()
         in_angle, converted_wheel_angle = self.get_wheel_angle()
 
-        self.draw_text("IN Speed: {}".format(in_speed),
-                       5, 0, (255, 255, 255))
-        self.draw_text("Converted Speed: {}".format(converted_speed),
-                       5, 20, (255, 255, 255))
-        self.draw_text("IN Angle: {}".format(in_angle),
-                       5, 40, (255, 255, 255))
-        self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
-                       5, 60, (255, 255, 255))
+        wheel_degree = self.get_wheel_degree()
+        speed_degree = self.get_speed_degree()
+
+        radius_tacho = 125
+        center_tacho = [1066-radius_tacho, 800]
+        pygame.draw.circle(screen, (150, 200, 0), center_tacho, radius_tacho)
+        #pygame.draw.rect(screen, (0, 0, 0), [15, 270, 250, 145])
+
+        spd_radar = center_tacho
+        spd_radar_len = radius_tacho
+        spd_x = spd_radar[0] + np.cos(np.radians(speed_degree)) * spd_radar_len
+        spd_y = spd_radar[1] + np.sin(np.radians(speed_degree)) * spd_radar_len
+        pygame.draw.line(screen, (255, 0, 0), center_tacho, [spd_x, spd_y], 5)
+
+        wd_radar = center_tacho
+        wd_radar_len = radius_tacho
+        wd_x = wd_radar[0] + np.cos(np.radians(wheel_degree)) * wd_radar_len
+        wd_y = wd_radar[1] + np.sin(np.radians(wheel_degree)) * wd_radar_len
+        pygame.draw.line(screen, (0, 0 ,255), center_tacho, [wd_x, wd_y], 5)
+
+        self.draw_text("Speed: {}".format(-int(in_speed * 100)),
+                       center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3, (255, 0, 0))
+        #self.draw_text("Converted Speed: {}".format(converted_speed),
+        #               5, 20, (255, 255, 255))
+        self.draw_text("Steering: {}".format(int(wheel_degree)+90),
+                       center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
+        #self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
+        #               5, 60, (255, 255, 255))
 
         # publish command for ros
         self.commands_pub.publish(ECU(converted_speed, converted_wheel_angle))
@@ -258,6 +278,20 @@ class Game:
         converted_value = linear_converter(CarConstants.MIN_WHEEL_ANGLE, CarConstants.MAX_WHEEL_ANGLE, value)
 
         return value, converted_value
+
+    def get_speed_degree(self):
+        axis = ControllerConstants.SPEED_AXIS
+        value = self.my_joystick.get_axis(axis)
+        converted_value = linear_converter(CarConstants.MIN_SPEED_DEGREE, CarConstants.MAX_SPEED_DEGREE, value, invert=True)
+
+        return converted_value
+
+    def get_wheel_degree(self):
+        axis = ControllerConstants.DIRECTION_AXIS
+        value = self.my_joystick.get_axis(axis)
+        converted_value = linear_converter(CarConstants.MIN_WHEEL_DEGREE, CarConstants.MAX_WHEEL_DEGREE, value)
+
+        return converted_value
 
 def main(args):
     rospy.init_node('game_node', anonymous=True)
