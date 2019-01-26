@@ -95,6 +95,7 @@ class Marker:
     def event(self,pos):
         self.found = True
 
+
     def augment(self,pos,markerwidth):
         text = None
         img = None
@@ -103,7 +104,7 @@ class Marker:
             if self.type == "memory":
                 img = pygame.image.load(pic_dict[self.id])
             elif self.type == "item":
-                img = pygame.image.load("Art/generic_item.png")
+                img = pygame.image.load("Art/generic_item_small.png")
         # ueberblende mit allgemeinem Erinnerungsicon
         else:
             if self.type == "memory":
@@ -125,23 +126,21 @@ class Marker:
         screen.blit(img, pygame.rect.Rect(pos[0]-img.get_width()/2, pos[1]-img.get_height()/2, img.get_width(), img.get_height()))
 
 
-class Item:
-    name = ""
-    obtained = False
-    id = 0
-
-    def __init__(self, name,id):
-        self.name = name
-        self.id = id
-        self.obatined=False
 
 class Car:
-    items_found = []
+    found = []
     battery_capacity = 0
     battery_charge = 0
     def __init__(self,cap = 10000):
         self.battery_capacity = cap
         self.battery_charge = cap
+    def event_handler(self,mem,pos):
+        self.found.append(mem)
+        if mem.type == "item":
+            if mem.id == Solar_Pan_id:
+                self.battery_capacity += 10000
+                print("increased capacity")
+        mem.event(pos)
 
 class Game:
 
@@ -216,7 +215,9 @@ class Game:
                 # draw id
                 for m in ml:
                     if not m.found:
-                        m.event(pos_flipped)
+                        #m.event(pos_flipped)
+                        self.car.event_handler(m ,pos_flipped)
+                        #self.car.found.append(m)
 
         # handle controller input
         in_speed, converted_speed = self.get_speed()

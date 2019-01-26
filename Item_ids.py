@@ -1,10 +1,10 @@
-Roc_Para_id = 320
+Roc_Para_id = 0
 Roc_Cont_id = 1
 Roc_Stor_id = 2
 Roc_Fuel_id = 3
 Roc_Thru_id = 4
 Mission_id  = 5
-Solar_Pan_id= 6
+Solar_Pan_id= 320
 Landscape_id = 64
 
 
@@ -25,7 +25,7 @@ pic_dict = {
     Roc_Stor_id : "",
     Roc_Fuel_id : "",
     Mission_id : "",
-    Solar_Pan_id : ""
+    Solar_Pan_id : "Art/Rover_Kaputt.png"
 
 }
 
