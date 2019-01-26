@@ -27,7 +27,7 @@ from ValueConverter import linear_converter
 
 # pygame setup
 pygame.mixer.pre_init()
-pygame.mixer.init(frequency=22050,size=-16,buffer=512)
+pygame.mixer.init(frequency=22050,size=-16,channels = 2,buffer=512)
 pygame.init()
 pygame.font.init()
 pygame.joystick.init()
@@ -366,7 +366,7 @@ def main(args):
     while True:
         if backsoundbool:
             backsoundbool = False
-            background_sound = pygame.mixer.Sound("Music/Hintergrundmusik.wav")
+            background_sound = pygame.mixer.Sound("Music/background.ogg")
             pygame.mixer.Channel(1).play(background_sound, loops = -1)
 
         game.loop()
