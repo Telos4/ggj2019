@@ -10,6 +10,8 @@ from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from barc.msg import Encoder
 from barc.msg import ECU
+from barc.msg import Light
+from barc.msg import Echo
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import time
@@ -55,13 +57,17 @@ class ImageConverter:
             self.image_sub = rospy.Subscriber(camera_stream, Image, self.callback)
 
         self.encoder = 0
+        self.echo = 0
+        self.light = 0
 
         self.cv_image = np.zeros((1, 1, 3), np.uint8)
         self.marker_found = False
         self.corners = np.full((0, 0, 0, 0), 1)
         self.ids = []
 
-        self.encoder_pub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
+        self.encoder_sub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
+        self.echo_sub = rospy.Subscriber("/echo", Echo, self.echo_callback)
+        self.light_sub = rospy.Subscriber("/light", Light, self.light_callback)
 
     def callback(self, data):
         try:
@@ -83,6 +89,14 @@ class ImageConverter:
 
     def encoder_callback(self, data):
         self.encoder = sum([data.FL, data.FR, data.BL, data.BR])
+
+    def echo_callback(self, data):
+        self.echo = data.distance
+        # print(data)
+
+    def light_callback(self, data):
+        self.light = data.light
+        # print(data)
 
 class Marker:
     def __init__(self, id, type):
@@ -245,15 +259,24 @@ class Game:
 
         self.draw_text("Speed: {}".format(-int(in_speed * 100)),
                        center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3, (255, 0, 0))
-        #self.draw_text("Converted Speed: {}".format(converted_speed),
-        #               5, 20, (255, 255, 255))
         self.draw_text("Steering: {}".format(int(wheel_degree)+90),
                        center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
-        #self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
-        #               5, 60, (255, 255, 255))
 
         # publish command for ros
         self.commands_pub.publish(ECU(converted_speed, converted_wheel_angle))
+
+        # demo how to use sensor values
+        if self.ic.encoder is not None:
+            encoder_text = myfont.render("Sum Enc = {}".format(self.ic.encoder), False, (0,0,0))
+            screen.blit(encoder_text, (260, 410))
+
+        if self.ic.echo is not None:
+            echo_text = myfont.render("Echo = {}".format(self.ic.echo), False, (0, 0, 0))
+            screen.blit(echo_text, (260, 500))
+
+        if self.ic.light is not None:
+            light_text = myfont.render("Light = {}".format(self.ic.light), False, (0, 0, 0))
+            screen.blit(light_text, (260, 600))
 
         pygame.display.update()
 
@@ -287,14 +310,22 @@ class Game:
 
     def get_speed_degree(self):
         axis = ControllerConstants.SPEED_AXIS
-        value = self.my_joystick.get_axis(axis)
+        try:
+            value = self.my_joystick.get_axis(axis)
+        except AttributeError:
+            # print("warning: no gamepad found!")
+            value = 0
         converted_value = linear_converter(CarConstants.MIN_SPEED_DEGREE, CarConstants.MAX_SPEED_DEGREE, value, invert=True)
 
         return converted_value
 
     def get_wheel_degree(self):
         axis = ControllerConstants.DIRECTION_AXIS
-        value = self.my_joystick.get_axis(axis)
+        try:
+            value = self.my_joystick.get_axis(axis)
+        except AttributeError:
+            # print("warning: no gamepad found!")
+            value = 0
         converted_value = linear_converter(CarConstants.MIN_WHEEL_DEGREE, CarConstants.MAX_WHEEL_DEGREE, value)
 
         return converted_value
