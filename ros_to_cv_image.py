@@ -9,6 +9,7 @@ import cv2.aruco as aruco
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from barc.msg import Encoder
+from barc.msg import ECU
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
@@ -146,6 +147,8 @@ class Game:
         self.markerlist = [Marker(1), Marker(2), Marker(64)]
         self.ic = ImageConverter()
 
+        self.commands_pub = rospy.Publisher("gamepad_commands", ECU)
+
         try:
             self.my_joystick = pygame.joystick.Joystick(0)
             self.my_joystick.init()
@@ -217,6 +220,9 @@ class Game:
                        5, 40, (255, 255, 255))
         self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
                        5, 60, (255, 255, 255))
+
+        # publish command for ros
+        self.commands_pub.publish(ECU(converted_speed, converted_wheel_angle))
 
         pygame.display.update()
 
