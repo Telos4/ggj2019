@@ -289,6 +289,22 @@ class Game:
         self.draw_text("Steering: {}".format(int(wheel_degree)+90),
                        center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
 
+
+        battery_position = [825, 15]
+        battery_size = [int(self.car.battery_capacity/100)+20, 70]
+        battery_rect = (battery_position[0], battery_position[1], battery_size[0], battery_size[1])
+
+        nub_size = [15, int(battery_size[1] / 2)]
+        nub_rect = (battery_position[0] + battery_size[0], battery_position[1] + int(battery_size[1] / 4), nub_size[0], nub_size[1])
+
+        charge_position = [battery_position[0] + 10, battery_position[1] + 10]
+        charge_size = [int(self.car.battery_charge/100), battery_size[1]-20]
+        charge_rect = (charge_position[0], charge_position[1], charge_size[0], charge_size[1])
+
+        pygame.draw.rect(screen, (255, 255, 255), battery_rect, 1)
+        pygame.draw.rect(screen, (255, 255, 255), nub_rect)
+        pygame.draw.rect(screen, (0, 255, 0), charge_rect)
+
         # publish command for ros
         self.commands_pub.publish(ECU(converted_speed, converted_wheel_angle))
 
@@ -304,8 +320,8 @@ class Game:
         if self.ic.light is not None:
             light_text = myfont.render("Light = {}".format(self.ic.light), False, (0, 0, 0))
             screen.blit(light_text, (260, 600))
-            if self.car.charging_possible and self.ic.light > Light_threshold:
-                self.car.battery_charge += 10
+            if self.car.charging_possible and self.ic.light > CarConstants.Light_threshold:
+                self.car.battery_charge = min (self.car.battery_charge + 1,self.car.battery_capacity)
 
         if self.ic.rfid is not None:
             rfid_text = myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
@@ -372,8 +388,8 @@ def main(args):
     while True:
         if backsoundbool:
             backsoundbool = False
-            background_sound = pygame.mixer.Sound("Music/Hintergrundmusik.wav")
-            pygame.mixer.Channel(1).play(background_sound, loops = -1)
+            #background_sound = pygame.mixer.Sound("Music/Hintergrundmusik.wav")
+            #pygame.mixer.Channel(1).play(background_sound, loops = -1)
 
         game.loop()
 
