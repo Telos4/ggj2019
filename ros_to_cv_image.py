@@ -28,6 +28,9 @@ teal = (0, 255, 255)
 camera_stream = "/image_raw"
 compression = True
 
+def two_norm(dx_vec,dy_vec):
+    return np.sqrt(dx_vec**2 + dy_vec**2)
+
 class image_converter:
     def __init__(self):
         self.image_pub = rospy.Publisher("pygame_image", Image)
@@ -40,6 +43,7 @@ class image_converter:
             self.image_sub = rospy.Subscriber(camera_stream, Image, self.callback)
 
         self.encoder = None
+
         #self.encoder_pub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
 
     def callback(self, data):
@@ -71,27 +75,36 @@ class image_converter:
         if marker_found:
             # find center of the marker
             pos = np.mean(corners[0][0], axis=0)
-            pos = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
 
-            # draw crosshair at marker center
-            linewidth = 3
-            pygame.draw.circle(frame, red, pos, 100, linewidth)
-            pygame.draw.circle(frame, red, pos, 50, linewidth)
-            pygame.draw.circle(frame, red, pos, 10, linewidth)
-            pygame.draw.line(frame, red, (pos[0] - 150, pos[1]), (pos[0] + 150, pos[1]), linewidth)
-            pygame.draw.line(frame, red, (pos[0], pos[1] - 150), (pos[0], pos[1] + 150), linewidth)
+            # [][][cornerid][dim]
+            side1_width = two_norm(corners[0][0][0][0] - corners[0][0][1][0], corners[0][0][0][1] - corners[0][0][1][1])
+            side2_width = two_norm(corners[0][0][1][0] - corners[0][0][2][0], corners[0][0][1][1] - corners[0][0][2][1])
 
-            # draw id
-            id = ids[0]
-            id_text = myfont.render("ID = {}".format(id), False, teal)
+            if np.abs(side1_width*side2_width) >= 10000:
 
-            screen.blit(frame, (0, 0))
-            screen.blit(id_text, pos)
+                pos = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
+                width_text = myfont.render("width = {}".format(side1_width), False, teal)
+
+                offset = pos[0] + 150, pos[1] + 150
+                screen.blit(width_text, offset)
+
+                # draw crosshair at marker center
+                linewidth = 3
+                pygame.draw.circle(frame, red, pos, 100, linewidth)
+                pygame.draw.circle(frame, red, pos, 50, linewidth)
+                pygame.draw.circle(frame, red, pos, 10, linewidth)
+                pygame.draw.line(frame, red, (pos[0] - 150, pos[1]), (pos[0] + 150, pos[1]), linewidth)
+                pygame.draw.line(frame, red, (pos[0], pos[1] - 150), (pos[0], pos[1] + 150), linewidth)
 
 
-        else:
-            # if no markers are found just draw the camera image
-            screen.blit(frame, (0,0))
+                # draw id
+                id = ids[0]
+                id_text = myfont.render("ID = {}".format(id), False, teal)
+
+                screen.blit(id_text, pos)
+
+
+        screen.blit(frame, (0, 0))
 
         if self.encoder is not None:
             encoder_text = myfont.render("Sum Enc = {}".format(self.encoder), False, (0,0,0))
