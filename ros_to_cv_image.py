@@ -16,13 +16,18 @@ import pygame
 
 from Item_ids import *
 
+import CarConstants
+import ControllerConstants
+from ValueConverter import linear_converter
+
 # pygame setup
 pygame.init()
 pygame.font.init()
+pygame.joystick.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 pygame.display.set_caption("ROS camera stream on Pygame")
-screenheight = 1000
-screenwidth = 16*screenheight//9
+screenheight = 800
+screenwidth = 4*screenheight//3
 screen = pygame.display.set_mode([screenwidth, screenheight])
 red = (255, 0, 0)
 teal = (0, 255, 255)
@@ -48,7 +53,7 @@ class ImageConverter:
         else:
             self.image_sub = rospy.Subscriber(camera_stream, Image, self.callback)
 
-        self.encoder = None
+        self.encoder = 0
 
         self.cv_image = np.zeros((1, 1, 3), np.uint8)
         self.marker_found = False
@@ -67,7 +72,7 @@ class ImageConverter:
             print(e)
         self.cv_image = np.fliplr(self.cv_image) # why is this necessary?
 
-        # self.cv_image = cv2.resize(self.cv_image,(screenwidth,screenheight))
+        #self.cv_image = cv2.resize(self.cv_image,(screenwidth,screenheight))
         # marker detection
         gray = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2GRAY)
         aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
@@ -122,24 +127,27 @@ class Item:
     def __init__(self, name,id):
         self.name = name
         self.id = id
-        self.obatined=False;
-
+        self.obatined=False
 
 class Car:
     items_found = []
     battery_capacity = 0
     battery_charge = 0
-
-    def __init__(self,cap = 1000):
+    def __init__(self,cap = 10000):
         self.battery_capacity = cap
         self.battery_charge = cap
 
-
 class Game:
 
-    def __init__(self):
+
+    def __init__(self, car):
+        self.car = car
+        self.travel_dist = 0
         self.markerlist = [Marker(1), Marker(2), Marker(64)]
         self.ic = ImageConverter()
+
+        self.my_joystick = pygame.joystick.Joystick(0)
+        self.my_joystick.init()
 
     def loop(self):
         # get recent image
@@ -151,9 +159,27 @@ class Game:
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])
 
+        # read pygame events ( = gamepad input )
+        g_keys = pygame.event.get()
+
+        #get traveled distance and handle charge
+        delta_dist = self.travel_dist - self.ic.encoder
+        travel_dist = self.ic.encoder
+        self.car.battery_charge -= delta_dist
+        if self.car.battery_charge < 0 :
+            print (" no charge left! ")
+        print("Charge: " + str(self.car.battery_charge))
+
+        # output of camera image in pygame screen
+        screen.fill([0, 0, 0])
+        # frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY) # (interesting colors)
+        cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
+        #cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
+
         frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         frame = np.rot90(frame)
         frame = pygame.surfarray.make_surface(frame)
+
         screen.blit(frame, (0, 0))
 
         if marker_found:
@@ -169,27 +195,61 @@ class Game:
                 m.augment(pos, side1_width)
 
             if np.abs(side1_width * side2_width) >= 10000:
-                # pos = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
+                pos = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
 
                 # draw id
                 for m in ml:
                     if not m.found:
                         m.event(pos)
 
+        # handle controller input
+        in_speed, converted_speed = self.get_speed()
+        in_angle, converted_wheel_angle = self.get_wheel_angle()
+
+        self.draw_text("IN Speed: {}".format(in_speed),
+                       5, 0, (255, 255, 255))
+        self.draw_text("Converted Speed: {}".format(converted_speed),
+                       5, 20, (255, 255, 255))
+        self.draw_text("IN Angle: {}".format(in_angle),
+                       5, 40, (255, 255, 255))
+        self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
+                       5, 60, (255, 255, 255))
+
         pygame.display.update()
 
+    def draw_text(self, text, x, y, color, align_right=False):
+        surface = myfont.render(text, True, color, (0, 0, 0))
+        surface.set_colorkey((0, 0, 0))
+
+        screen.blit(surface, (x, y))
+
+    def get_speed(self):
+        axis = ControllerConstants.SPEED_AXIS
+        value = self.my_joystick.get_axis(axis)
+        converted_value = linear_converter(CarConstants.MIN_SPEED, CarConstants.MAX_SPEED, value, invert=True)
+
+        return value, converted_value
+
+    def get_wheel_angle(self):
+        axis = ControllerConstants.DIRECTION_AXIS
+        value = self.my_joystick.get_axis(axis)
+        converted_value = linear_converter(CarConstants.MIN_WHEEL_ANGLE, CarConstants.MAX_WHEEL_ANGLE, value)
+
+        return value, converted_value
 
 def main(args):
-    rospy.init_node('image_converter', anonymous=True)
-    game = Game()
+    rospy.init_node('game_node', anonymous=True)
+    car = Car()
+    game = Game(car)
+
     while True:
         game.loop()
 
-    try:
-        rospy.spin()
-    except KeyboardInterrupt:
-        print("Shutting down")
-    cv2.destroyAllWindows()
+    # try:
+    #     rospy.spin()
+    # except KeyboardInterrupt:
+    #     print("Shutting down")
+    # cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
