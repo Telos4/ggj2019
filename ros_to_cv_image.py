@@ -65,14 +65,14 @@ class ImageConverter:
     def callback(self, data):
         try:
             if compression:
-                self.cv_image = self.bridge.compressed_imgmsg_to_cv2(data)
+                self.cv_image_small = self.bridge.compressed_imgmsg_to_cv2(data)
             else:
-                self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+                self.cv_image_small = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             print(e)
-        self.cv_image = np.fliplr(self.cv_image) # why is this necessary?
+        self.cv_image_small = np.fliplr(self.cv_image_small) # why is this necessary?
 
-        #self.cv_image = cv2.resize(self.cv_image,(screenwidth,screenheight))
+        self.cv_image = cv2.resize(self.cv_image_small,(screenwidth,screenheight))
         # marker detection
         gray = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2GRAY)
         aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
@@ -115,8 +115,8 @@ class Marker:
                 img = pygame.image.load("Art/generic_memory.jpg")
 
         screen.blit(text, pos)
-        img = pygame.transform.scale(img, (int(markerwidth), int(markerwidth)))
-        screen.blit(img, pygame.rect.Rect(pos[0], pos[1], markerwidth, markerwidth))
+        img = pygame.transform.scale(img, (int(1.2*markerwidth), int(1.2*markerwidth)))
+        screen.blit(img, pygame.rect.Rect(pos[0]-markerwidth/2, pos[1]-markerwidth/2, markerwidth, markerwidth))
 
 
 class Item:
@@ -173,8 +173,9 @@ class Game:
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])
         # frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY) # (interesting colors)
-        cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
+        #oldheight, oldwidth, dum = cv_image.shape
         #cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
+        #newheight, newwidth, dum2 = cv_image.shape
 
         frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         frame = np.rot90(frame)
@@ -184,23 +185,27 @@ class Game:
 
         if marker_found:
             # find center of the marker
+            #for i in range(4):
+            #    corners[0][0][i][0] *= int(newwidth*1. / oldwidth);
+            #    corners[0][0][i][1] *= int(newheight*1. / oldheight);
+
             pos = np.mean(corners[0][0], axis=0)
 
             # [][][cornerid][dim]
             side1_width = two_norm(corners[0][0][0][0] - corners[0][0][1][0], corners[0][0][0][1] - corners[0][0][1][1])
             side2_width = two_norm(corners[0][0][1][0] - corners[0][0][2][0], corners[0][0][1][1] - corners[0][0][2][1])
+            pos_flipped = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
 
             ml=[mar for mar in self.markerlist if mar.id == ids[0]]
             for m in ml:
-                m.augment(pos, side1_width)
+                m.augment(pos_flipped, side1_width)
 
             if np.abs(side1_width * side2_width) >= 10000:
-                pos = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
 
                 # draw id
                 for m in ml:
                     if not m.found:
-                        m.event(pos)
+                        m.event(pos_flipped)
 
         # handle controller input
         in_speed, converted_speed = self.get_speed()
