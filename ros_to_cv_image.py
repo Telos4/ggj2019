@@ -15,7 +15,6 @@ import numpy as np
 import pygame
 
 from Item_ids import *
-import time
 
 # pygame setup
 pygame.init()
@@ -33,10 +32,12 @@ teal = (0, 255, 255)
 camera_stream = "/image_raw"
 compression = True
 
+
 def two_norm(dx_vec,dy_vec):
     return np.sqrt(dx_vec**2 + dy_vec**2)
 
-class image_converter:
+
+class ImageConverter:
     def __init__(self):
         self.image_pub = rospy.Publisher("pygame_image", Image)
 
@@ -49,9 +50,9 @@ class image_converter:
 
         self.encoder = None
 
-        self.cv_image = np.zeros((1,1,3), np.uint8)
+        self.cv_image = np.zeros((1, 1, 3), np.uint8)
         self.marker_found = False
-        self.corners = np.full((0,0,0,0),1)
+        self.corners = np.full((0, 0, 0, 0), 1)
         self.ids = []
 
         self.encoder_pub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
@@ -66,6 +67,7 @@ class image_converter:
             print(e)
         self.cv_image = np.fliplr(self.cv_image) # why is this necessary?
 
+        # self.cv_image = cv2.resize(self.cv_image,(screenwidth,screenheight))
         # marker detection
         gray = cv2.cvtColor(self.cv_image, cv2.COLOR_BGR2GRAY)
         aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
@@ -77,42 +79,57 @@ class image_converter:
             encoder_text = myfont.render("Sum Enc = {}".format(self.encoder), False, (0,0,0))
             screen.blit(encoder_text, (260, 410))
 
-
     def encoder_callback(self, data):
         self.encoder = sum([data.FL, data.FR, data.BL, data.BR])
         #print(data)
 
-class marker:
-    def __init__(self,id):
+
+class Marker:
+    def __init__(self, id):
         self.id = id
         self.uptime = 0
+        self.found = False
+
+    # item aufheben, erinnerung abspielen
     def event(self,pos):
         if self.id == Landscape_id:
-            img = pygame.image.load(pic_dict[Landscape_id])
-            #screen.blit(img, (1,1), (0,0,100,100))
-            #img = cv2.resize(img,screenwidth,screenheight)
-            screen.blit(img, pygame.rect.Rect(0,0,screenwidth,screenheight))
-            #pygame.display.flip();
-            id_text = myfont.render("ID = {}".format(self.id), False, teal)
-            screen.blit(id_text, pos)
-            #screen.blit(myfont.render("In EVENT", False, teal),(0,0))
-            pygame.display.update()
-            time.sleep(time_dict[Landscape_id])
+            self.found = True
 
-class item:
+    def augment(self,pos,markerwidth):
+        text = None
+        img = None
+        if self.id == Landscape_id:
+            # ueberblende mit spezifischem Erinnerungsbild
+            if self.found:
+                text = myfont.render("hatte ich schon", False, teal)
+                img = pygame.image.load(pic_dict[self.id])
+                print("hatteich scbon")
+            # ueberblende mit allgemeinem Erinnerungsicon
+            else:
+                text = myfont.render("hatte ich noch nicht", False, teal)
+                img = pygame.image.load("Art/generic_memory.jpg")
+
+        screen.blit(text, pos)
+        img = pygame.transform.scale(img, (int(markerwidth), int(markerwidth)))
+        screen.blit(img, pygame.rect.Rect(pos[0], pos[1], markerwidth, markerwidth))
+
+
+class Item:
     name = ""
     obtained = False
     id = 0
+
     def __init__(self, name,id):
         self.name = name
         self.id = id
         self.obatined=False;
 
 
-class car:
+class Car:
     items_found = []
     battery_capacity = 0
     battery_charge = 0
+
     def __init__(self,cap = 1000):
         self.battery_capacity = cap
         self.battery_charge = cap
@@ -121,8 +138,8 @@ class car:
 class Game:
 
     def __init__(self):
-        self.markerlist = [marker(1), marker(2), marker(64)]
-        self.ic = image_converter()
+        self.markerlist = [Marker(1), Marker(2), Marker(64)]
+        self.ic = ImageConverter()
 
     def loop(self):
         # get recent image
@@ -131,20 +148,13 @@ class Game:
         corners = self.ic.corners
         ids = self.ic.ids
 
-
-
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])
-        # frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY) # (interesting colors)
-        cv_image.shape
-        cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
-        cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
 
         frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         frame = np.rot90(frame)
         frame = pygame.surfarray.make_surface(frame)
-        #pygame.draw.rect(frame, (0, 0, 255), (0, 0, 100, 200))
-        #pygame.draw.rect(frame, (255, 0, 0), (250, 400, 400, 100))
+        screen.blit(frame, (0, 0))
 
         if marker_found:
             # find center of the marker
@@ -154,21 +164,17 @@ class Game:
             side1_width = two_norm(corners[0][0][0][0] - corners[0][0][1][0], corners[0][0][0][1] - corners[0][0][1][1])
             side2_width = two_norm(corners[0][0][1][0] - corners[0][0][2][0], corners[0][0][1][1] - corners[0][0][2][1])
 
+            ml=[mar for mar in self.markerlist if mar.id == ids[0]]
+            for m in ml:
+                m.augment(pos, side1_width)
+
             if np.abs(side1_width * side2_width) >= 10000:
-                pos = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
-                # draw crosshair at marker center
-                linewidth = 3
-                pygame.draw.circle(frame, red, pos, 100, linewidth)
-                pygame.draw.circle(frame, red, pos, 50, linewidth)
-                pygame.draw.circle(frame, red, pos, 10, linewidth)
-                pygame.draw.line(frame, red, (pos[0] - 150, pos[1]), (pos[0] + 150, pos[1]), linewidth)
-                pygame.draw.line(frame, red, (pos[0], pos[1] - 150), (pos[0], pos[1] + 150), linewidth)
+                # pos = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
 
                 # draw id
-
-                [mar for mar in self.markerlist if mar.id == ids[0]][0].event(pos)
-
-        screen.blit(frame, (0, 0))
+                for m in ml:
+                    if not m.found:
+                        m.event(pos)
 
         pygame.display.update()
 
