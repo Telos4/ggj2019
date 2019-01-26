@@ -163,8 +163,8 @@ class Game:
         g_keys = pygame.event.get()
 
         #get traveled distance and handle charge
-        delta_dist = self.travel_dist - self.ic.encoder
-        travel_dist = self.ic.encoder
+        delta_dist = abs(self.travel_dist - self.ic.encoder)
+        self.travel_dist = self.ic.encoder
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0 :
             print (" no charge left! ")
