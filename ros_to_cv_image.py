@@ -9,6 +9,7 @@ import cv2.aruco as aruco
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from barc.msg import Encoder
+from barc.msg import ECU
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
@@ -146,8 +147,13 @@ class Game:
         self.markerlist = [Marker(1), Marker(2), Marker(64)]
         self.ic = ImageConverter()
 
-        self.my_joystick = pygame.joystick.Joystick(0)
-        self.my_joystick.init()
+        self.commands_pub = rospy.Publisher("gamepad_commands", ECU)
+
+        try:
+            self.my_joystick = pygame.joystick.Joystick(0)
+            self.my_joystick.init()
+        except pygame.error:
+            print("warning: no gamepad found!")
 
     def loop(self):
         # get recent image
@@ -163,8 +169,8 @@ class Game:
         g_keys = pygame.event.get()
 
         #get traveled distance and handle charge
-        delta_dist = self.travel_dist - self.ic.encoder
-        travel_dist = self.ic.encoder
+        delta_dist = abs(self.travel_dist - self.ic.encoder)
+        self.travel_dist = self.ic.encoder
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0 :
             print (" no charge left! ")
@@ -220,6 +226,9 @@ class Game:
         self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
                        5, 60, (255, 255, 255))
 
+        # publish command for ros
+        self.commands_pub.publish(ECU(converted_speed, converted_wheel_angle))
+
         pygame.display.update()
 
     def draw_text(self, text, x, y, color, align_right=False):
@@ -230,14 +239,22 @@ class Game:
 
     def get_speed(self):
         axis = ControllerConstants.SPEED_AXIS
-        value = self.my_joystick.get_axis(axis)
+        try:
+            value = self.my_joystick.get_axis(axis)
+        except AttributeError:
+            #print("warning: no gamepad found!")
+            value = 0
         converted_value = linear_converter(CarConstants.MIN_SPEED, CarConstants.MAX_SPEED, value, invert=True)
 
         return value, converted_value
 
     def get_wheel_angle(self):
         axis = ControllerConstants.DIRECTION_AXIS
-        value = self.my_joystick.get_axis(axis)
+        try:
+            value = self.my_joystick.get_axis(axis)
+        except AttributeError:
+            #print("warning: no gamepad found!")
+            value = 0
         converted_value = linear_converter(CarConstants.MIN_WHEEL_ANGLE, CarConstants.MAX_WHEEL_ANGLE, value)
 
         return value, converted_value
