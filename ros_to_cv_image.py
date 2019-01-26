@@ -12,6 +12,7 @@ from barc.msg import Encoder
 from barc.msg import ECU
 from barc.msg import Light
 from barc.msg import Echo
+from barc.msg import RFID
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import time
@@ -62,6 +63,7 @@ class ImageConverter:
         self.encoder = 0
         self.echo = 0
         self.light = 0
+        self.rfid = 0
 
         self.cv_image = np.zeros((1, 1, 3), np.uint8)
         self.marker_found = False
@@ -71,6 +73,7 @@ class ImageConverter:
         self.encoder_sub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
         self.echo_sub = rospy.Subscriber("/echo", Echo, self.echo_callback)
         self.light_sub = rospy.Subscriber("/light", Light, self.light_callback)
+        self.rfid_sub = rospy.Subscriber("/rfid", RFID, self.rfid_callback)
 
     def callback(self, data):
         try:
@@ -102,6 +105,9 @@ class ImageConverter:
     def light_callback(self, data):
         self.light = data.light
         # print(data)
+
+    def rfid_callback(self, data):
+        self.rfid = data.id
 
 class Marker:
     def __init__(self, id, type):
@@ -294,6 +300,10 @@ class Game:
         if self.ic.light is not None:
             light_text = myfont.render("Light = {}".format(self.ic.light), False, (0, 0, 0))
             screen.blit(light_text, (260, 600))
+
+        if self.ic.rfid is not None:
+            rfid_text = myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
+            screen.blit(rfid_text, (260, 700))
 
         pygame.display.update()
 
