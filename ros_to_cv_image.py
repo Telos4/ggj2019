@@ -146,8 +146,11 @@ class Game:
         self.markerlist = [Marker(1), Marker(2), Marker(64)]
         self.ic = ImageConverter()
 
-        self.my_joystick = pygame.joystick.Joystick(0)
-        self.my_joystick.init()
+        try:
+            self.my_joystick = pygame.joystick.Joystick(0)
+            self.my_joystick.init()
+        except pygame.error:
+            print("warning: no gamepad found!")
 
     def loop(self):
         # get recent image
@@ -225,14 +228,22 @@ class Game:
 
     def get_speed(self):
         axis = ControllerConstants.SPEED_AXIS
-        value = self.my_joystick.get_axis(axis)
+        try:
+            value = self.my_joystick.get_axis(axis)
+        except AttributeError:
+            #print("warning: no gamepad found!")
+            value = 0
         converted_value = linear_converter(CarConstants.MIN_SPEED, CarConstants.MAX_SPEED, value, invert=True)
 
         return value, converted_value
 
     def get_wheel_angle(self):
         axis = ControllerConstants.DIRECTION_AXIS
-        value = self.my_joystick.get_axis(axis)
+        try:
+            value = self.my_joystick.get_axis(axis)
+        except AttributeError:
+            #print("warning: no gamepad found!")
+            value = 0
         converted_value = linear_converter(CarConstants.MIN_WHEEL_ANGLE, CarConstants.MAX_WHEEL_ANGLE, value)
 
         return value, converted_value
