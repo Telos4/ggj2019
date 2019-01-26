@@ -13,6 +13,8 @@ from ValueConverter import linear_converter
 
 from Item_ids import *
 from marker import Marker
+from rfid import RfidEvent
+from datetime import datetime,timedelta
 
 import time
 
@@ -41,6 +43,7 @@ class Game:
 
         self.car = car
         self.markerlist = []
+        self.current_rfid_events = []
         for i in type_list:
             self.markerlist.append(Marker(i[0],i[1], self.screen))
         #self.markerlist = [Marker(1,"memory"), Marker(2,"memory"), Marker(64,"memory"), Marker(320,"item")]
@@ -180,6 +183,20 @@ class Game:
         if self.ic.rfid is not None:
             rfid_text = self.myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
             self.screen.blit(rfid_text, (260, 700))
+            if self.ic.rfid > 0:
+                if self.ic.rfid == 224:
+                    rfide = RfidEvent(self.ic.rfid,duration=5,img="Art/Hinderniss-_Rock.png",screen = self.screen)
+                self.current_rfid_events.append(rfide)
+                rfide.start()
+        t = datetime.now()
+        for r in self.current_rfid_events:
+            if t > r.start_time + r.time_duration:
+                r.stop()
+                self.current_rfid_events.remove(r)
+                print("if")
+            else:
+                r.event()
+                print("else")
 
         pygame.display.update()
 

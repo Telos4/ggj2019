@@ -13,12 +13,6 @@ def main(args):
     backsoundbool = True
 
     while True:
-        if backsoundbool:
-            backsoundbool = False
-            #background_sound = pygame.mixer.Sound("Music/Hintergrundmusik.wav")
-            #pygame.mixer.Channel(1).play(background_sound, loops = -1)
-
-
         game.loop()
 
 if __name__ == '__main__':
