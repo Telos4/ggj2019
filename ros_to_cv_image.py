@@ -8,7 +8,7 @@ import cv2
 import cv2.aruco as aruco
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
-from barc.msg import Encoder
+#from barc.msg import Encoder
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 
@@ -40,7 +40,7 @@ class image_converter:
             self.image_sub = rospy.Subscriber(camera_stream, Image, self.callback)
 
         self.encoder = None
-        self.encoder_pub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
+        #self.encoder_pub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
 
     def callback(self, data):
         try:
@@ -61,8 +61,8 @@ class image_converter:
 
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])
-        frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY) # (interesting colors)
-        #frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+        #frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY) # (interesting colors)
+        frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         frame = np.rot90(frame)
         frame = pygame.surfarray.make_surface(frame)
         pygame.draw.rect(frame, (0, 0, 255), (0, 0, 100, 200))
