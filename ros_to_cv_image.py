@@ -81,14 +81,8 @@ class ImageConverter:
         self.corners, self.ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
         self.marker_found = len(self.corners) > 0
 
-        if self.encoder is not None:
-            encoder_text = myfont.render("Sum Enc = {}".format(self.encoder), False, (0,0,0))
-            screen.blit(encoder_text, (260, 410))
-
     def encoder_callback(self, data):
         self.encoder = sum([data.FL, data.FR, data.BL, data.BR])
-        #print(data)
-
 
 class Marker:
     def __init__(self, id, type):
@@ -109,19 +103,22 @@ class Marker:
             if self.type == "memory":
                 img = pygame.image.load(pic_dict[self.id])
             elif self.type == "item":
-                img = pygame.image.load("Art/generic_memory.jpg")
+                img = pygame.image.load("Art/generic_item.png")
         # ueberblende mit allgemeinem Erinnerungsicon
         else:
             if self.type == "memory":
-                img = pygame.image.load("Art/generic_memory.jpg")
+                img = pygame.image.load("Art/generic_memory.png")
             elif self.type == "item":
                 img = pygame.image.load(pic_dict[self.id])
 
         if markerwidth > 100:
-            xscaling = int(3*16./9)
-            yscaling = 3
+            xscaling = int(4*16./9)
+            yscaling = 4
+            if self.type == "item":
+                img = pygame.image.load(pic_dict[self.id])
+
         else:
-            xscaling = yscaling = 1.2
+            xscaling = yscaling = 1.5
 
         img = pygame.transform.scale(img, (int(xscaling*markerwidth), int(yscaling*markerwidth)))
 
@@ -183,7 +180,6 @@ class Game:
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0 :
             print (" no charge left! ")
-        print("Charge: " + str(self.car.battery_charge))
 
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])

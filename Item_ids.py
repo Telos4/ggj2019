@@ -21,7 +21,7 @@ item_dict = {
 pic_dict = {
     Landscape_id :"Art/landscape.png",
     Roc_Cont_id: "",
-    Roc_Para_id : "Art/landscape.png",
+    Roc_Para_id : "Art/Rover.png",
     Roc_Stor_id : "",
     Roc_Fuel_id : "",
     Mission_id : "",
