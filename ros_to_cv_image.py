@@ -117,13 +117,14 @@ class car:
     items_found = []
     battery_capacity = 0
     battery_charge = 0
-    def __init__(self,cap = 1000):
+    def __init__(self,cap = 10000):
         self.battery_capacity = cap
         self.battery_charge = cap
 
 class Game:
 
-    def __init__(self):
+    def __init__(self, car):
+        self.car = car
         self.markerlist = [marker(1), marker(2), marker(64)]
         self.ic = image_converter()
 
@@ -137,7 +138,16 @@ class Game:
         corners = self.ic.corners
         ids = self.ic.ids
 
+        # read pygame events ( = gamepad input )
         g_keys = pygame.event.get()
+
+        #get traveled distance and handle charge
+        delta_dist = self.travel_dist - self.encoder
+        travel_dist = self.encoder
+        car.battery_charge -= delta_dist
+        if car.battery_charge < 0 :
+            print (" no charge left! ")
+        print("Charge: " + str(self.car.battery_charge))
 
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])
@@ -210,7 +220,9 @@ class Game:
 
 def main(args):
     rospy.init_node('game_node', anonymous=True)
-    game = Game()
+    car = car()
+    game = Game(car)
+
     while True:
         game.loop()
 
