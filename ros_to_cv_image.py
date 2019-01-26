@@ -16,6 +16,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import time
 import pygame
+from datetime import datetime
 
 from Item_ids import *
 
@@ -86,6 +87,8 @@ class ImageConverter:
         parameters = aruco.DetectorParameters_create()
         self.corners, self.ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
         self.marker_found = len(self.corners) > 0
+        if self.marker_found:
+            print(self.ids[0])
 
     def encoder_callback(self, data):
         self.encoder = sum([data.FL, data.FR, data.BL, data.BR])
@@ -108,15 +111,19 @@ class Marker:
     # item aufheben, erinnerung abspielen
     def event(self,pos):
         self.found = True
+        self.time_found = datetime.now()
 
 
-    def augment(self,pos,markerwidth):
+    def augment(self,pos,markerwidth,car):
         text = None
         img = None
         # ueberblende mit spezifischem Erinnerungsbild
         if self.found:
             if self.type == "memory":
-                img = pygame.image.load(pic_dict[self.id])
+                dt = (datetime.now()-self.time_found).seconds
+                dummy = ( dt % (2*time_dict[self.id]))
+                index =  dummy / time_dict[self.id]
+                img = pygame.image.load(pic_dict[self.id][index])
             elif self.type == "item":
                 img = pygame.image.load("Art/generic_item_small.png")
         # ueberblende mit allgemeinem Erinnerungsicon
@@ -125,6 +132,11 @@ class Marker:
                 img = pygame.image.load("Art/generic_memory.png")
             elif self.type == "item":
                 img = pygame.image.load(pic_dict[self.id])
+            elif self.type == "home":
+                if len(car.found) == len(item_dict) and markerwidth > 100:
+                    img = pygame.image.load("Art/home_won.png")
+                else:
+                    img = pygame.image.load("Art/home_not_won.png")
 
         if markerwidth > 100:
             xscaling = int(4*16./9)
@@ -142,26 +154,31 @@ class Marker:
 
 
 class Car:
-    found = []
-    battery_capacity = 0
-    battery_charge = 0
     def __init__(self,cap = 10000):
         self.battery_capacity = cap
         self.battery_charge = cap
+        self.charging_possible = False
+        self.found = []
+
     def event_handler(self,mem,pos):
         self.found.append(mem)
         if mem.type == "item":
-            if mem.id == Solar_Pan_id:
+            if mem.id == Battery_id:
                 self.battery_capacity += 10000
                 print("increased capacity")
+            if mem.id == Solar_Pan_id:
+                self.battery_capacity += 10000
+                print("charging now possible")
+
         mem.event(pos)
 
 class Game:
-
-
     def __init__(self, car):
         self.car = car
-        self.markerlist = [Marker(1,"memory"), Marker(2,"memory"), Marker(64,"memory"), Marker(320,"item")]
+        self.markerlist = []
+        for i in type_list:
+            self.markerlist.append(Marker(i[0],i[1]))
+        #self.markerlist = [Marker(1,"memory"), Marker(2,"memory"), Marker(64,"memory"), Marker(320,"item")]
         self.ic = ImageConverter()
         time.sleep(0.5) # wait for hardware
         self.travel_dist = self.ic.encoder
@@ -222,16 +239,14 @@ class Game:
 
             ml=[mar for mar in self.markerlist if mar.id == ids[0]]
             for m in ml:
-                m.augment(pos_flipped, side1_width)
+                m.augment(pos_flipped, side1_width,self.car)
 
             if np.abs(side1_width * side2_width) >= 10000:
 
                 # draw id
                 for m in ml:
-                    if not m.found:
-                        #m.event(pos_flipped)
+                    if (not m.found) and (m.id != Home_id):
                         self.car.event_handler(m ,pos_flipped)
-                        #self.car.found.append(m)
 
         # handle controller input
         in_speed, converted_speed = self.get_speed()
