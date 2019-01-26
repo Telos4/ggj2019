@@ -17,7 +17,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import time
 import pygame
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from Item_ids import *
 
@@ -163,6 +163,28 @@ class Marker:
 
         screen.blit(img, pygame.rect.Rect(pos[0]-img.get_width()/2, pos[1]-img.get_height()/2, img.get_width(), img.get_height()))
 
+class RfidEvent:
+    def __init__(self,id,duration,img):
+        self.id = id
+        self.triggered = True
+        self.start_time = datetime.now()
+        self.time_duration = timedelta(seconds=duration)
+        self.img = pygame.image.load(img)
+    def start(self):
+        if self.id == 224:
+            CarConstants.MAX_SPEED*=CarConstants.RFID_SLOWDOWN
+            CarConstants.MIN_SPEED*=(1-CarConstants.RFID_SLOWDOWN)
+    def stop(self):
+        if self.id == 224:
+            CarConstants.MAX_SPEED/=CarConstants.RFID_SLOWDOWN
+            CarConstants.MIN_SPEED/=(1-CarConstants.RFID_SLOWDOWN)
+    def event(self):
+        if self.id == 224:
+            self.img = pygame.transform.scale(self.img , (40, 60))
+            screen.blit(self.img, (20,20))
+            print("zomg sandsturm")
+
+
 
 
 class Car:
@@ -188,6 +210,7 @@ class Car:
 class Game:
     def __init__(self, car):
         self.car = car
+        self.current_rfid_events = []
         self.markerlist = []
         for i in type_list:
             self.markerlist.append(Marker(i[0],i[1]))
@@ -327,6 +350,20 @@ class Game:
         if self.ic.rfid is not None:
             rfid_text = myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
             screen.blit(rfid_text, (260, 700))
+            if self.ic.rfid != -1:
+                if self.ic.rfid == 224:
+                    rfide = RfidEvent(self.ic.rfid,duration=5,img="Art/Hinderniss-_Rock.png")
+                self.current_rfid_events.append(rfide)
+                rfide.start()
+        t = datetime.now()
+        for r in self.current_rfid_events:
+            if t > r.start_time + r.time_duration:
+                r.stop()
+                self.current_rfid_events.remove(r)
+                print("if")
+            else:
+                r.event()
+                print("else")
 
         pygame.display.update()
 
