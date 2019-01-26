@@ -10,7 +10,7 @@ class App:
         pygame.init()
 
         pygame.display.set_caption("Space Agency")
-        self.screen = pygame.display.set_mode((1000, 1000))
+        self.screen = pygame.display.set_mode((300, 80))
         self.font = pygame.font.SysFont("Courier", 20)
 
         # Set up the joystick
@@ -45,13 +45,13 @@ class App:
 
         self.screen.fill(0)
         self.draw_text("IN Speed: {}".format(in_speed),
-                       5, 20, (255, 255, 255))
+                       5, 0, (255, 255, 255))
         self.draw_text("Converted Speed: {}".format(converted_speed),
-                       5, 40, (255, 255, 255))
+                       5, 20, (255, 255, 255))
         self.draw_text("IN Angle: {}".format(in_angle),
-                       5, 60, (255, 255, 255))
+                       5, 40, (255, 255, 255))
         self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
-                       5, 80, (255, 255, 255))
+                       5, 60, (255, 255, 255))
 
         pygame.display.flip()
 
