@@ -107,6 +107,25 @@ class image_converter:
         self.encoder = sum([data.FL, data.FR, data.BL, data.BR])
         #print(data)
 
+class item:
+    name
+    obtained
+    def __init__(self,name):
+        self.name = name
+        obatined=False;
+
+
+
+class car:
+    items = []
+    items_found = []
+    battery_capacity
+    battery_charge
+    def __init__(cap = 1000):
+        self.battery_capacity = cap
+        self.battery_charge = cap
+
+
 
 def main(args):
     ic = image_converter()
