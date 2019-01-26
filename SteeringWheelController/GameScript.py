@@ -10,7 +10,7 @@ class App:
         pygame.init()
 
         pygame.display.set_caption("Space Agency")
-        self.screen = pygame.display.set_mode((300, 270))
+        self.screen = pygame.display.set_mode((300, 400))
         self.font = pygame.font.SysFont("Courier", 20)
 
         # Set up the joystick
@@ -89,6 +89,28 @@ class App:
         wd_y = wd_radar[1] + math.sin(math.radians(wheel_degree)) * wd_radar_len
         pygame.draw.line(self.screen, (0, 0 ,255), [140, 270], [wd_x, wd_y], 5)
 
+
+
+
+        battery_position = [15, 300]
+        battery_size = [220, 70]
+        battery_rect = (battery_position[0], battery_position[1], battery_size[0], battery_size[1])
+
+        nub_size = [15, int(battery_size[1]/2)]
+        nub_rect = (battery_position[0]+battery_size[0], battery_position[1]+int(battery_size[1]/4), nub_size[0], nub_size[1])
+
+        charge_position = [battery_position[0]+10, battery_position[1]+10]
+        charge_size = [200, 50]
+        charge_rect = (charge_position[0], charge_position[1], charge_size[0], charge_size[1])
+
+        pygame.draw.rect(self.screen, (255, 255 ,255), battery_rect, 1)
+        pygame.draw.rect(self.screen, (255, 255, 255), nub_rect)
+        pygame.draw.rect(self.screen, (0, 255, 0), charge_rect)
+
+
+
+
+
         pygame.display.flip()
 
     def quit(self):
@@ -97,7 +119,6 @@ class App:
 
 if __name__ == '__main__':
     app = App()
-
     while True:
         g_keys = pygame.event.get()
 
