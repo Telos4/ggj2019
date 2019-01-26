@@ -22,11 +22,14 @@ def two_norm(dx_vec,dy_vec):
 class Game:
     def __init__(self, car):
         pygame.mixer.pre_init()
-        pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+        pygame.mixer.init()
         pygame.init()
         pygame.font.init()
         pygame.joystick.init()
         pygame.display.set_caption("ROS camera stream on Pygame")
+
+        background_sound = pygame.mixer.Sound("Music/background.ogg")
+        pygame.mixer.Channel(1).play(background_sound, loops=-1)
 
         self.myfont = pygame.font.SysFont('Comic Sans MS', 30)
         self.screenheight = 800
