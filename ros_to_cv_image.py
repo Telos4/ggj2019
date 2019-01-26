@@ -14,7 +14,7 @@ from barc.msg import Light
 from barc.msg import Echo
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
-
+import time
 import pygame
 
 from Item_ids import *
@@ -99,33 +99,44 @@ class ImageConverter:
         # print(data)
 
 class Marker:
-    def __init__(self, id):
+    def __init__(self, id, type):
         self.id = id
         self.uptime = 0
         self.found = False
+        self.type = type
 
     # item aufheben, erinnerung abspielen
     def event(self,pos):
-        if self.id == Landscape_id:
-            self.found = True
+        self.found = True
 
     def augment(self,pos,markerwidth):
         text = None
         img = None
-        if self.id == Landscape_id:
-            # ueberblende mit spezifischem Erinnerungsbild
-            if self.found:
-                text = myfont.render("hatte ich schon", False, teal)
+        # ueberblende mit spezifischem Erinnerungsbild
+        if self.found:
+            if self.type == "memory":
                 img = pygame.image.load(pic_dict[self.id])
-                print("hatteich scbon")
-            # ueberblende mit allgemeinem Erinnerungsicon
-            else:
-                text = myfont.render("hatte ich noch nicht", False, teal)
-                img = pygame.image.load("Art/generic_memory.jpg")
+            elif self.type == "item":
+                img = pygame.image.load("Art/generic_item.png")
+        # ueberblende mit allgemeinem Erinnerungsicon
+        else:
+            if self.type == "memory":
+                img = pygame.image.load("Art/generic_memory.png")
+            elif self.type == "item":
+                img = pygame.image.load(pic_dict[self.id])
 
-        screen.blit(text, pos)
-        img = pygame.transform.scale(img, (int(1.2*markerwidth), int(1.2*markerwidth)))
-        screen.blit(img, pygame.rect.Rect(pos[0]-markerwidth/2, pos[1]-markerwidth/2, markerwidth, markerwidth))
+        if markerwidth > 100:
+            xscaling = int(4*16./9)
+            yscaling = 4
+            if self.type == "item":
+                img = pygame.image.load(pic_dict[self.id])
+
+        else:
+            xscaling = yscaling = 1.5
+
+        img = pygame.transform.scale(img, (int(xscaling*markerwidth), int(yscaling*markerwidth)))
+
+        screen.blit(img, pygame.rect.Rect(pos[0]-img.get_width()/2, pos[1]-img.get_height()/2, img.get_width(), img.get_height()))
 
 
 class Item:
@@ -151,9 +162,10 @@ class Game:
 
     def __init__(self, car):
         self.car = car
-        self.travel_dist = 0
-        self.markerlist = [Marker(1), Marker(2), Marker(64)]
+        self.markerlist = [Marker(1,"memory"), Marker(2,"memory"), Marker(64,"memory"), Marker(320,"item")]
         self.ic = ImageConverter()
+        time.sleep(0.5) # wait for hardware
+        self.travel_dist = self.ic.encoder
 
         self.commands_pub = rospy.Publisher("gamepad_commands", ECU)
 
@@ -182,7 +194,6 @@ class Game:
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0 :
             print (" no charge left! ")
-        print("Charge: " + str(self.car.battery_charge))
 
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])
