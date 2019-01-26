@@ -17,13 +17,18 @@ import pygame
 from Item_ids import *
 import time
 
+import CarConstants
+import ControllerConstants
+from ValueConverter import linear_converter
+
 # pygame setup
 pygame.init()
 pygame.font.init()
+pygame.joystick.init()
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 pygame.display.set_caption("ROS camera stream on Pygame")
-screenheight = 1000
-screenwidth = 16*screenheight//9
+screenheight = 800
+screenwidth = 4*screenheight//3
 screen = pygame.display.set_mode([screenwidth, screenheight])
 red = (255, 0, 0)
 teal = (0, 255, 255)
@@ -106,8 +111,7 @@ class item:
     def __init__(self, name,id):
         self.name = name
         self.id = id
-        self.obatined=False;
-
+        self.obatined=False
 
 class car:
     items_found = []
@@ -117,12 +121,14 @@ class car:
         self.battery_capacity = cap
         self.battery_charge = cap
 
-
 class Game:
 
     def __init__(self):
         self.markerlist = [marker(1), marker(2), marker(64)]
         self.ic = image_converter()
+
+        self.my_joystick = pygame.joystick.Joystick(0)
+        self.my_joystick.init()
 
     def loop(self):
         # get recent image
@@ -131,20 +137,17 @@ class Game:
         corners = self.ic.corners
         ids = self.ic.ids
 
-
+        g_keys = pygame.event.get()
 
         # output of camera image in pygame screen
         screen.fill([0, 0, 0])
         # frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY) # (interesting colors)
-        cv_image.shape
         cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
         cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
 
         frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         frame = np.rot90(frame)
         frame = pygame.surfarray.make_surface(frame)
-        #pygame.draw.rect(frame, (0, 0, 255), (0, 0, 100, 200))
-        #pygame.draw.rect(frame, (255, 0, 0), (250, 400, 400, 100))
 
         if marker_found:
             # find center of the marker
@@ -170,20 +173,52 @@ class Game:
 
         screen.blit(frame, (0, 0))
 
+        # handle controller input
+        in_speed, converted_speed = self.get_speed()
+        in_angle, converted_wheel_angle = self.get_wheel_angle()
+
+        self.draw_text("IN Speed: {}".format(in_speed),
+                       5, 0, (255, 255, 255))
+        self.draw_text("Converted Speed: {}".format(converted_speed),
+                       5, 20, (255, 255, 255))
+        self.draw_text("IN Angle: {}".format(in_angle),
+                       5, 40, (255, 255, 255))
+        self.draw_text("Converted Angle: {}".format(converted_wheel_angle),
+                       5, 60, (255, 255, 255))
+
         pygame.display.update()
 
+    def draw_text(self, text, x, y, color, align_right=False):
+        surface = myfont.render(text, True, color, (0, 0, 0))
+        surface.set_colorkey((0, 0, 0))
+
+        screen.blit(surface, (x, y))
+
+    def get_speed(self):
+        axis = ControllerConstants.SPEED_AXIS
+        value = self.my_joystick.get_axis(axis)
+        converted_value = linear_converter(CarConstants.MIN_SPEED, CarConstants.MAX_SPEED, value, invert=True)
+
+        return value, converted_value
+
+    def get_wheel_angle(self):
+        axis = ControllerConstants.DIRECTION_AXIS
+        value = self.my_joystick.get_axis(axis)
+        converted_value = linear_converter(CarConstants.MIN_WHEEL_ANGLE, CarConstants.MAX_WHEEL_ANGLE, value)
+
+        return value, converted_value
 
 def main(args):
-    rospy.init_node('image_converter', anonymous=True)
+    rospy.init_node('game_node', anonymous=True)
     game = Game()
     while True:
         game.loop()
 
-    try:
-        rospy.spin()
-    except KeyboardInterrupt:
-        print("Shutting down")
-    cv2.destroyAllWindows()
+    # try:
+    #     rospy.spin()
+    # except KeyboardInterrupt:
+    #     print("Shutting down")
+    # cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
