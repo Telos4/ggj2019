@@ -98,6 +98,13 @@ class Game:
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0 :
             print (" no charge left! ")
+            gameover_img =pygame.image.load("Art/Rover_Kaputt.png")
+            gameover_img = pygame.transform.resize(gameover_img,(self.screenwidth,self.screenheight))
+            self.screen.blit(gameover_img, (0,0))
+            pygame.display.update()
+            time.sleep(5)
+            pygame.quit()
+            quit()
             # TODO implement game over screen
 
         # output of camera image in pygame screen
