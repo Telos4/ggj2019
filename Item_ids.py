@@ -44,16 +44,16 @@ item_dict = {
     "Mission":Mission_id,
 }
 pic_dict = {
-    Roc_Cont_id: "Art/Raketenteile_Steuerelement.png",
-    Roc_Para_id : "Art/Item_fallschirm.png",
-    Roc_Stor_id : "Art/Raketenteile_Kapsel.png",
-    Roc_Fuel_id : "Art/Treibstoff.png",
-    Roc_Thru_id : "Art/Plan-_Triebwerk.png",
-    Solar_Pan_id: "Art/Item_solarpanel.png",
-    Battery_id: "Art/Battery.png",
-    Landscape_id: ["Art/landscape.png","Art/Erinnerung1.png"],
-    Mission_id : "Art/Rocket_Plan.png",
-    Memory_01_id : ["Art/Erinnerung0.png","Art/Erinnerung1.png"]
+    Roc_Cont_id: "Raketenteile_Steuerelement.png",
+    Roc_Para_id : "Item_fallschirm.png",
+    Roc_Stor_id : "Raketenteile_Kapsel.png",
+    Roc_Fuel_id : "Treibstoff.png",
+    Roc_Thru_id : "Plan-_Triebwerk.png",
+    Solar_Pan_id: "Item_solarpanel.png",
+    Battery_id: "Battery.png",
+    Landscape_id: ["landscape.png","Erinnerung1.png"],
+    Mission_id : "Rocket_Plan.png",
+    Memory_01_id : ["Erinnerung0.png","Erinnerung1.png"]
 }
 
 music_dict = {
