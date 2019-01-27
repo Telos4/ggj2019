@@ -42,7 +42,8 @@ class Marker:
                     img = pygame.image.load("Art/home_not_won.png")
 
         if markerwidth > 100:
-            xscaling = int(4*16./9)
+            x,y = img.get_rect().size
+            xscaling = int(4*x/y)
             yscaling = 4
             if self.type == "item":
                 img = pygame.image.load(pic_dict[self.id])
