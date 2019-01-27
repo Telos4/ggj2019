@@ -136,7 +136,7 @@ class Game:
 
         self.screen.blit(frame, (0, 0))
 
-        overlay = pygame.image.load("Art/Overlay.png")
+        overlay = pygame.image.load("Art/Overlay_neu.png")
         overlay = pygame.transform.scale(overlay, (self.screenwidth, self.screenheight) )
 
         self.screen.blit(overlay , (0,0))
