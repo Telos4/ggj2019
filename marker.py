@@ -4,8 +4,11 @@ from datetime import datetime
 from Item_ids import *
 
 class Marker:
-    memdir = "Art/Faded/"
+    memdir = "Art/faded/"
     itemdir = "Art/"
+    generic_mem = pygame.image.load(itemdir + "generic_memory.png")
+    generic_item = pygame.image.load(itemdir + "generic_item_small.png")
+
     def __init__(self, id, type, screen):
         self.id = id
         self.uptime = 0
@@ -38,11 +41,11 @@ class Marker:
                 index = 0 if dummy < 1. * music_transition_dict[self.id] / self.sound_length else 1
                 img = self.imgs[index] #pygame.image.load(pic_dict[self.id][index])
             elif self.type == "item":
-                img = pygame.image.load("Art/generic_item_small.png")
+                img = generic_item # pygame.image.load("Art/generic_item_small.png")
         # ueberblende mit allgemeinem Erinnerungsicon
         else:
             if self.type == "memory":
-                img = pygame.image.load("Art/generic_memory.png")
+                img = generic_mem #pygame.image.load("Art/generic_memory.png")
             elif self.type == "item":
                 img = self.img #pygame.image.load(pic_dict[self.id])
             elif self.type == "home":
