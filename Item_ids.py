@@ -16,6 +16,8 @@ Memory_01_id = 128
 # TODO implement correct ids
 Memory_02_id = None
 Memory_03_id = None
+Memory_04_id = None
+Memory_05_id = None
 
 type_list = [
     [Roc_Cont_id, "item"],
@@ -57,14 +59,17 @@ pic_dict = {
 music_dict = {
     Memory_01_id: "Music/Erinnerung1.ogg",
     Memory_02_id: "Music/Erinnerung2.ogg",
-    Memory_03_id: "Music/Erinnerung3.ogg"
+    Memory_03_id: "Music/Erinnerung3.ogg",
+    Memory_04_id: "Music/Erinnerung4.ogg",
+    Memory_05_id: "Music/Erinnerung5.ogg"
 }
 
 music_transition_dict = {
     Memory_01_id: 5.5,
     Memory_02_id: 4.3,
-    # TODO insert correct times
-    Memory_03_id: 0.7
+    Memory_03_id: 8.0,
+    Memory_04_id: 5.5,
+    Memory_05_id: 3.0,
 }
 
 time_dict = {
