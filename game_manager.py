@@ -73,7 +73,7 @@ class Game:
             pygame.event.get()
         self.game_start_time = datetime.now()
 
-        self.debug_output = True
+        self.debug_output = False
 
     def colorize(self, image, newColor):
         """
@@ -249,8 +249,9 @@ class Game:
                     self.car.battery_charge = min (self.car.battery_charge + 1,self.car.battery_capacity)
 
         if self.ic.rfid is not None:
-            rfid_text = self.myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
-            self.screen.blit(rfid_text, (260, 700))
+            if self.debug_output:
+                rfid_text = self.myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
+                self.screen.blit(rfid_text, (260, 700))
             if self.ic.rfid > 0:
                 if self.ic.rfid == rfid.sandstorm_id:
                     rfide = rfid.RfidEvent(self.ic.rfid,duration=5,img="Art/Sandstorm.png",screen = self.screen)
