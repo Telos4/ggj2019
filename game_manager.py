@@ -66,9 +66,10 @@ class Game:
         myfontbig = pygame.font.SysFont('Comic Sans MS', 50)
         self.draw_text("Press throttle to begin",int(self.screenwidth/2),int(self.screenheight/3), (255, 0, 0),myfontbig)
 
-        #pygame.display.update()
-        #while abs(self.get_wheel_angle()[1]-1500) <= 100:
-        #    pygame.event.get()
+        pygame.display.update()
+        while abs(self.get_wheel_angle()[1]-1500) <= 100:
+            pygame.event.get()
+        self.game_start_time = datetime.now()
 
     def colorize(self, image, newColor):
         """
@@ -85,6 +86,14 @@ class Game:
         marker_found = self.ic.marker_found
         corners = self.ic.corners
         ids = self.ic.ids
+        time_passed = (datetime.now()-self.game_start_time)
+        h = 1.
+        # jetzt < start + 5 sek
+        if time_passed.total_seconds() < 5:
+            h = time_passed.total_seconds()/5*np.sin(2.5/5*np.pi*time_passed.total_seconds())**2
+            pygame.draw.rect(self.screen, (0, 0, 0), [0, 0, self.screenwidth, int((1 -h)/2*self.screenheight)])
+            pygame.draw.rect(self.screen, (0, 0, 0), [0, int((1+h)/2*self.screenheight), self.screenwidth, self.screenheight])
+            pygame.display.flip()
 
         # output of camera image in pygame screen
         self.screen.fill([0, 0, 0])
@@ -127,7 +136,7 @@ class Game:
 
         self.screen.blit(frame, (0, 0))
 
-        overlay = pygame.image.load("Art/Overlay.png")
+        overlay = pygame.image.load("Art/Overlay_neu.png")
         overlay = pygame.transform.scale(overlay, (self.screenwidth, self.screenheight) )
 
         self.screen.blit(overlay , (0,0))
