@@ -42,7 +42,7 @@ class Game:
 
 
         self.overlay = pygame.image.load("Art/Overlay_neu.png")
-        self.overlay = pygame.transform.scale(overlay, (self.screenwidth, self.screenheight) )
+        self.overlay = pygame.transform.scale(self.overlay, (self.screenwidth, self.screenheight) )
         self.car = car
         self.markerlist = []
         self.current_rfid_events = []
