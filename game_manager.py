@@ -60,6 +60,25 @@ class Game:
         except pygame.error:
             print("warning: no gamepad found!")
 
+        img = pygame.image.load("Art/Titelbild.png")
+        img = pygame.transform.scale(img, (self.screenwidth,self.screenheight))
+        self.screen.blit(img,(0,0))
+        myfontbig = pygame.font.SysFont('Comic Sans MS', 50)
+        self.draw_text("Press throttle to begin",int(self.screenwidth/2),int(self.screenheight/3), (255, 0, 0),myfontbig)
+
+        pygame.display.update()
+        while abs(self.get_wheel_angle()[1]-1500) <= 100:
+            pygame.event.get()
+
+    def colorize(self, image, newColor):
+        """
+        Colorize image with the specified color
+        """
+        image = image.copy()
+        image.fill(newColor[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
+
+        return image
+
     def loop(self):
         # get recent image
         cv_image = self.ic.cv_image
@@ -92,12 +111,26 @@ class Game:
         frame = np.rot90(frame)
         frame = pygame.surfarray.make_surface(frame)
 
+        frame = self.colorize(frame, (128, 0, 0))
+
         self.screen.blit(frame, (0, 0))
 
         overlay = pygame.image.load("Art/Overlay.png")
-        overlay = pygame.transform.scale(overlay, (screenwidth, screenheight) )
+        overlay = pygame.transform.scale(overlay, (self.screenwidth, self.screenheight) )
 
         self.screen.blit(overlay , (0,0))
+
+        #print all collected items
+        posy = self.screenheight - 60
+        posx = 50
+        for it in self.car.found:
+            if it.type == "item":
+                img = pygame.image.load(pic_dict[it.id])
+                x,y = img.get_rect().size
+                size = (50*x/y,50)
+                img = pygame.transform.scale(img,size)
+                self.screen.blit(img, (posx,posy))
+                posx += 50*x/y
 
         if marker_found:
             # find center of the marker
@@ -207,8 +240,10 @@ class Game:
 
         pygame.display.update()
 
-    def draw_text(self, text, x, y, color, align_right=False):
-        surface = self.myfont.render(text, True, color, (0, 0, 0))
+    def draw_text(self, text, x, y, color, align_right=False, font = None):
+        if font is None:
+            font = self.myfont
+        surface = font.render(text, True, color, (0, 0, 0))
         surface.set_colorkey((0, 0, 0))
 
         self.screen.blit(surface, (x, y))
