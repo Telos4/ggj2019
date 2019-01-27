@@ -73,7 +73,7 @@ class Game:
             pygame.event.get()
         self.game_start_time = datetime.now()
 
-        self.debug_output = False
+        self.debug_output = True
 
     def colorize(self, image, newColor):
         """
@@ -246,8 +246,7 @@ class Game:
                 light_text = self.myfont.render("Light = {}".format(self.ic.light), False, (0, 0, 0))
                 self.screen.blit(light_text, (260, 600))
                 if self.car.charging_possible and self.ic.light > CarConstants.Light_threshold:
-                    self.car.battery_charge = min (self.car.battery_charge + 1,self.car.battery_capacity)
-
+                    self.car.battery_charge = min (self.car.battery_charge + 10,self.car.battery_capacity)
         if self.ic.rfid is not None:
             if self.debug_output:
                 rfid_text = self.myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
