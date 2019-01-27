@@ -86,7 +86,6 @@ class Game:
         image.fill(newColor[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
 
         return image
->>>>>>> 0784508f14302807fab8391251bb3a3ce29d9260
 
     def loop(self):
         # get recent image
@@ -133,12 +132,13 @@ class Game:
         posy = self.screenheight - 60
         posx = 50
         for it in self.car.found:
-            img = pygame.image.load(pic_dict[it.id])
-            x,y = img.get_rect()
-            size = (50*x/y,50)
-            img = pygame.transform.scale(img,size)
-            self.screen.blit(img, (posx,posy))
-            posx += 50*x/y
+            if it.type == "item":
+                img = pygame.image.load(pic_dict[it.id])
+                x,y = img.get_rect().size
+                size = (50*x/y,50)
+                img = pygame.transform.scale(img,size)
+                self.screen.blit(img, (posx,posy))
+                posx += 50*x/y
 
         if marker_found:
             # find center of the marker
