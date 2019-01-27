@@ -2,6 +2,7 @@ import pygame
 
 from datetime import datetime
 from Item_ids import *
+import subprocess
 
 class Marker:
     memdir = "Art/faded/"
@@ -48,11 +49,10 @@ class Marker:
                 img = Marker.generic_mem #pygame.image.load("Art/generic_memory.png")
             elif self.type == "item":
                 img = self.img #pygame.image.load(pic_dict[self.id])
-            elif self.type == "home":
-                if len(car.found) == len(item_dict) and markerwidth > 100:
-                    img = pygame.image.load("Art/home_won.png")
-                else:
-                    img = pygame.image.load("Art/home_not_won.png")
+        #if self.found:
+        if len(car.found) == len(item_dict) and markerwidth > 100:
+            subprocess.call(["vlc", "--fullscreen", "endfilm.mov"])
+
 
         if markerwidth > 100:
             x,y = img.get_rect().size
