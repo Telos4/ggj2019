@@ -12,7 +12,6 @@ Mission_id  = 320
 # Home_id = 832
 
 Memory_01_id = 128
-# TODO implement correct ids
 Memory_02_id = 896
 Memory_03_id = 192
 Memory_04_id = 832
