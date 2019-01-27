@@ -107,14 +107,13 @@ class Game:
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0:
             print (" no charge left! ")
-            gameover_img =pygame.image.load("Art/Rover_Kaputt.png")
+            gameover_img =pygame.image.load("Art/Game_Over_Screen.png")
             gameover_img = pygame.transform.scale(gameover_img,(self.screenwidth,self.screenheight))
             self.screen.blit(gameover_img, (0,0))
             pygame.display.update()
             time.sleep(5)
             pygame.quit()
             quit()
-            # TODO implement game over screen
 
         # output of camera image in pygame screen
         self.screen.fill([0, 0, 0])
@@ -146,20 +145,14 @@ class Game:
         posx = 50
         for it in self.car.found:
             if it.type == "item":
-                img = it.img_small #pygame.image.load(pic_dict[it.id])
+                img = it.img_small
                 x,y = img.get_rect().size
                 self.screen.blit(it.img_small, (posx,posy))
                 posx += x
 
         if marker_found:
-            # find center of the marker
-            #for i in range(4):
-            #    corners[0][0][i][0] *= int(newwidth*1. / oldwidth);
-            #    corners[0][0][i][1] *= int(newheight*1. / oldheight);
-
             pos = np.mean(corners[0][0], axis=0)
 
-            # [][][cornerid][dim]
             side1_width = two_norm(corners[0][0][0][0] - corners[0][0][1][0], corners[0][0][0][1] - corners[0][0][1][1])
             side2_width = two_norm(corners[0][0][1][0] - corners[0][0][2][0], corners[0][0][1][1] - corners[0][0][2][1])
             pos_flipped = (cv_image.shape[1] - int(pos[0]), int(pos[1]))
