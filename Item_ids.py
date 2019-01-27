@@ -7,7 +7,6 @@ Roc_Thru_id = 64
 Solar_Pan_id = 384
 Battery_id = 576
 
-Landscape_id = 640
 Mission_id  = 320
 
 # Home_id = 832
@@ -17,7 +16,7 @@ Memory_01_id = 128
 Memory_02_id = 896
 Memory_03_id = 192
 Memory_04_id = 832
-Memory_05_id = None
+Memory_05_id = 640
 
 type_list = [
     [Roc_Cont_id, "item"],
@@ -27,12 +26,11 @@ type_list = [
     [Roc_Thru_id,"item"],
     [Solar_Pan_id, "item"],
     [Battery_id, "item"],
-    [Landscape_id, "memory"],
     [Mission_id, "item"],
-    [Memory_01_id, "memory"]
-    [Memory_02_id, "memory"]
-    [Memory_03_id, "memory"]
-    [Memory_04_id, "memory"]
+    [Memory_01_id, "memory"],
+    [Memory_02_id, "memory"],
+    [Memory_03_id, "memory"],
+    [Memory_04_id, "memory"],
     [Memory_05_id, "memory"]
 ]
 
@@ -90,7 +88,6 @@ music_transition_dict = {
 
 time_dict = {
     Memory_01_id : 3,
-    Landscape_id : 3
 }
 
 
