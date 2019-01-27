@@ -10,12 +10,13 @@ class Marker:
         self.found = False
         self.type = type
         self.screen = screen
+        if self.type == "memory":
+            self.sound_length = None
 
     # item aufheben, erinnerung abspielen
     def event(self,pos):
         self.found = True
         self.time_found = datetime.now()
-
 
     def augment(self,pos,markerwidth,car):
         text = None
@@ -23,9 +24,10 @@ class Marker:
         # ueberblende mit spezifischem Erinnerungsbild
         if self.found:
             if self.type == "memory":
-                dt = (datetime.now()-self.time_found).seconds
-                dummy = ( dt % (2*time_dict[self.id]))
-                index =  dummy / time_dict[self.id]
+                transition_time = music_transition_dict[self.id]
+                delta = (datetime.now()-self.time_found).seconds
+                dummy = 1. * (delta % self.sound_length) / self.sound_length
+                index = 0 if dummy < 1. * music_transition_dict[self.id] / self.sound_length else 1
                 img = pygame.image.load(pic_dict[self.id][index])
             elif self.type == "item":
                 img = pygame.image.load("Art/generic_item_small.png")
@@ -42,7 +44,8 @@ class Marker:
                     img = pygame.image.load("Art/home_not_won.png")
 
         if markerwidth > 100:
-            xscaling = int(4*16./9)
+            x,y = img.get_rect().size
+            xscaling = int(4*x/y)
             yscaling = 4
             if self.type == "item":
                 img = pygame.image.load(pic_dict[self.id])

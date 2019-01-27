@@ -1,4 +1,6 @@
 from Item_ids import *
+import pygame
+
 
 class Car:
     def __init__(self,cap = 10000):
@@ -17,5 +19,14 @@ class Car:
             if mem.id == Solar_Pan_id:
                 self.charging_possible = True
                 print("charging now possible")
+        elif mem.type == "memory":
+            try:
+                sound_file = music_dict[mem.id]
+            except KeyError:
+                sound_file = None
+            if sound_file:
+                background_sound = pygame.mixer.Sound(sound_file)
+                mem.sound_length = background_sound.get_length()
+                pygame.mixer.Channel(2).play(sound_file)
 
         mem.event(pos)

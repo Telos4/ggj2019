@@ -79,6 +79,7 @@ class Game:
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0 :
             print (" no charge left! ")
+            # TODO implement game over screen
 
         # output of camera image in pygame screen
         self.screen.fill([0, 0, 0])
