@@ -66,7 +66,7 @@ class Game:
         img = pygame.transform.scale(img, (self.screenwidth,self.screenheight))
         self.screen.blit(img,(0,0))
         myfontbig = pygame.font.SysFont('Comic Sans MS', 80)
-        self.draw_text("Press throttle to begin",int(self.screenwidth/2)-320,int(self.screenheight/2)+10, (255, 0, 0),myfontbig)
+        self.draw_text("Press throttle to begin",int(self.screenwidth/2)-400,int(self.screenheight/2)+10, (255, 0, 0),myfontbig)
 
         pygame.display.update()
         while abs(self.get_speed()[1]-1500) <= 20:
