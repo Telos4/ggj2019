@@ -51,7 +51,7 @@ class Marker:
                 img = self.img #pygame.image.load(pic_dict[self.id])
         #if self.found:
         if len(car.found) == len(item_dict) and markerwidth > 100:
-            subprocess.call(["vlc", "--fullscreen", "endfilm.mov"])
+            subprocess.call(["vlc", "--fullscreen", "Art/not_used/BRTA_come_home.mov"])
 
 
         if markerwidth > 100:
