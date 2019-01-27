@@ -1,6 +1,7 @@
 import pygame
 
 from datetime import datetime,timedelta
+import random
 import CarConstants
 
 class RfidEvent:
@@ -21,6 +22,7 @@ class RfidEvent:
             CarConstants.MIN_SPEED/=(1-CarConstants.RFID_SLOWDOWN)
     def event(self):
         if self.id == 224:
-            self.img = pygame.transform.scale(self.img, (40, 60))
-            self.screen.blit(self.img, (20, 20))
-            print("zomg sandsturm")
+            self.img = pygame.transform.scale(self.img, (int(1.5*self.screen.get_width()), int(1.5*self.screen.get_height())))
+            randomx = random.randint(-20,20)
+            randomy = random.randint(-20,20)
+            self.screen.blit(self.img, (-20+randomx, -20+randomy))

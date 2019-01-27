@@ -356,7 +356,7 @@ class Game:
             screen.blit(rfid_text, (260, 700))
             if self.ic.rfid != -1:
                 if self.ic.rfid == 224:
-                    rfide = RfidEvent(self.ic.rfid,duration=5,img="Art/Hinderniss-_Rock.png")
+                    rfide = RfidEvent(self.ic.rfid,duration=5,img="Art/Sandstorm.png")
                 self.current_rfid_events.append(rfide)
                 rfide.start()
         t = datetime.now()

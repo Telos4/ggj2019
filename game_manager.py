@@ -143,6 +143,7 @@ class Game:
 
         self.draw_text("Speed: {}".format(-int(in_speed * 100)),
                        center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3, (255, 0, 0))
+        self.draw_text("Debug Speed: {}".format(int(converted_speed)), center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3 -25, (255, 0, 0))
         self.draw_text("Steering: {}".format(int(wheel_degree)+90),
                        center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
 
@@ -185,7 +186,7 @@ class Game:
             self.screen.blit(rfid_text, (260, 700))
             if self.ic.rfid > 0:
                 if self.ic.rfid == 224:
-                    rfide = RfidEvent(self.ic.rfid,duration=5,img="Art/Hinderniss-_Rock.png",screen = self.screen)
+                    rfide = RfidEvent(self.ic.rfid,duration=5,img="Art/Sandstorm.png",screen = self.screen)
                 self.current_rfid_events.append(rfide)
                 rfide.start()
         t = datetime.now()
