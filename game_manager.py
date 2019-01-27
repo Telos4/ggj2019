@@ -13,7 +13,7 @@ from ValueConverter import linear_converter
 
 from Item_ids import *
 from marker import Marker
-from rfid import RfidEvent
+import rfid
 from datetime import datetime,timedelta
 
 import time
@@ -107,11 +107,16 @@ class Game:
         #cv_image = cv2.resize(cv_image,(screenwidth,screenheight))
         #newheight, newwidth, dum2 = cv_image.shape
 
-        frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
+        if self.emp_event_active():
+            frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+        else:
+            frame = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         frame = np.rot90(frame)
         frame = pygame.surfarray.make_surface(frame)
 
-        frame = self.colorize(frame, (128, 0, 0))
+        if not self.emp_event_active():
+            # color filter for Mars feeling
+            frame = self.colorize(frame, (128, 0, 0))
 
         self.screen.blit(frame, (0, 0))
 
@@ -222,10 +227,17 @@ class Game:
             rfid_text = self.myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
             self.screen.blit(rfid_text, (260, 700))
             if self.ic.rfid > 0:
-                if self.ic.rfid == 224:
-                    rfide = RfidEvent(self.ic.rfid,duration=5,img="Art/Sandstorm.png",screen = self.screen)
-                self.current_rfid_events.append(rfide)
-                rfide.start()
+                print(self.ic.rfid)
+                if self.ic.rfid == rfid.sandstorm_id:
+                    rfide = rfid.RfidEvent(self.ic.rfid,duration=5,img="Art/Sandstorm.png",screen = self.screen)
+                    self.current_rfid_events.append(rfide)
+                    rfide.start()
+                elif self.ic.rfid == rfid.emp_id:
+                    rfide = rfid.RfidEvent(self.ic.rfid, duration=5, img=None, screen=None)
+                    self.current_rfid_events.append(rfide)
+                    rfide.start()
+                else:
+                    print("unrecognized rfid")
         t = datetime.now()
         for r in self.current_rfid_events:
             if t > r.start_time + r.time_duration:
@@ -237,6 +249,13 @@ class Game:
                 print("else")
 
         pygame.display.update()
+
+    def emp_event_active(self):
+        # check if an EMP is currently active
+        for event in self.current_rfid_events:
+            if event.emp_active:
+                return True
+        return False
 
     def draw_text(self, text, x, y, color, align_right=False, font = None):
         if font is None:
