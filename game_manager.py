@@ -41,6 +41,8 @@ class Game:
         teal = (0, 255, 255)
 
 
+        self.overlay = pygame.image.load("Art/Overlay_neu.png")
+        self.overlay = pygame.transform.scale(overlay, (self.screenwidth, self.screenheight) )
         self.car = car
         self.markerlist = []
         self.current_rfid_events = []
@@ -135,10 +137,8 @@ class Game:
 
         self.screen.blit(frame, (0, 0))
 
-        overlay = pygame.image.load("Art/Overlay_neu.png")
-        overlay = pygame.transform.scale(overlay, (self.screenwidth, self.screenheight) )
 
-        self.screen.blit(overlay , (0,0))
+        self.screen.blit(self.overlay , (0,0))
 
         #print all collected items
         posy = self.screenheight - 100
