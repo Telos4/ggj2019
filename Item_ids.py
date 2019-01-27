@@ -13,6 +13,9 @@ Mission_id  = 320
 Home_id = 832
 
 Memory_01_id = 128
+# TODO implement correct ids
+Memory_02_id = None
+Memory_03_id = None
 
 type_list = [
     [Roc_Cont_id, "item"],
@@ -49,6 +52,19 @@ pic_dict = {
     Landscape_id: ["Art/landscape.png","Art/Erinnerung1.png"],
     Mission_id : "Art/Rocket_Plan.png",
     Memory_01_id : ["Art/Erinnerung0.png","Art/Erinnerung1.png"]
+}
+
+music_dict = {
+    Memory_01_id: "Music/Erinnerung1.ogg",
+    Memory_02_id: "Music/Erinnerung2.ogg",
+    Memory_03_id: "Music/Erinnerung3.ogg"
+}
+
+music_transition_dict = {
+    Memory_01_id: 5.5,
+    Memory_02_id: 4.3,
+    # TODO insert correct times
+    Memory_03_id: 0.7
 }
 
 time_dict = {
