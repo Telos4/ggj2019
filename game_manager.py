@@ -99,6 +99,17 @@ class Game:
 
         self.screen.blit(overlay , (0,0))
 
+        #print all collected items
+        posy = self.screenheight - 60
+        posx = 50
+        for it in self.car.found:
+            img = pygame.image.load(pic_dict[it.id])
+            x,y = img.get_rect()
+            size = (50*x/y,50)
+            img = pygame.transform.scale(img,size)
+            self.screen.blit(img, (posx,posy))
+            posx += 50*x/y
+
         if marker_found:
             # find center of the marker
             #for i in range(4):
