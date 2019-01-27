@@ -21,7 +21,7 @@ class Marker:
         if self.type == "item":
             self.img = pygame.image.load(Marker.itemdir + pic_dict[self.id]) #load images when marker is created to not load it every time -> more fps
             x,y = self.img.get_rect().size
-            size = (50*x/y,50)
+            size = (75*x/y,75)
             self.img_small = pygame.transform.scale(self.img,size)
 
     # item aufheben, erinnerung abspielen

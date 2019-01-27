@@ -96,10 +96,10 @@ class Game:
         delta_dist = abs(self.travel_dist - self.ic.encoder)
         self.travel_dist = self.ic.encoder
         self.car.battery_charge -= delta_dist
-        if self.car.battery_charge < 0 :
+        if self.car.battery_charge < 0:
             print (" no charge left! ")
             gameover_img =pygame.image.load("Art/Rover_Kaputt.png")
-            gameover_img = pygame.transform.resize(gameover_img,(self.screenwidth,self.screenheight))
+            gameover_img = pygame.transform.scale(gameover_img,(self.screenwidth,self.screenheight))
             self.screen.blit(gameover_img, (0,0))
             pygame.display.update()
             time.sleep(5)
@@ -133,14 +133,14 @@ class Game:
         self.screen.blit(overlay , (0,0))
 
         #print all collected items
-        posy = self.screenheight - 60
+        posy = self.screenheight - 100
         posx = 50
         for it in self.car.found:
             if it.type == "item":
                 img = it.img_small #pygame.image.load(pic_dict[it.id])
                 x,y = img.get_rect().size
                 self.screen.blit(it.img_small, (posx,posy))
-                posx += x + 20
+                posx += x
 
         if marker_found:
             # find center of the marker

@@ -65,7 +65,7 @@ class ROS_communicator:
         self.marker_found = len(self.corners) > 0
 
     def encoder_callback(self, data):
-        self.encoder = 10.0 * sum([data.FL, data.FR, data.BL, data.BR])
+        self.encoder = 20.0 * sum([data.FL, data.FR, data.BL, data.BR])
 
     def echo_callback(self, data):
         self.echo = data.distance
