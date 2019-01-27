@@ -73,7 +73,7 @@ class Game:
             pygame.event.get()
         self.game_start_time = datetime.now()
 
-        self.debug_output = True
+        self.debug_output = False
 
     def colorize(self, image, newColor):
         """
@@ -111,6 +111,7 @@ class Game:
         self.car.battery_charge -= delta_dist
         if self.car.battery_charge < 0:
             print (" no charge left! ")
+            self.commands_pub.publish(ECU(1500, 1500))
             gameover_img =pygame.image.load("Art/Game_Over_Screen.png")
             gameover_img = pygame.transform.scale(gameover_img,(self.screenwidth,self.screenheight))
             self.screen.blit(gameover_img, (0,0))
