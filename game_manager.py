@@ -125,12 +125,10 @@ class Game:
         posx = 50
         for it in self.car.found:
             if it.type == "item":
-                img = pygame.image.load(pic_dict[it.id])
+                img = it.img_small #pygame.image.load(pic_dict[it.id])
                 x,y = img.get_rect().size
-                size = (50*x/y,50)
-                img = pygame.transform.scale(img,size)
-                self.screen.blit(img, (posx,posy))
-                posx += 50*x/y
+                self.screen.blit(it.img_small, (posx,posy))
+                posx += x + 20
 
         if marker_found:
             # find center of the marker
