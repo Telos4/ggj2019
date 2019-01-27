@@ -60,6 +60,16 @@ class Game:
         except pygame.error:
             print("warning: no gamepad found!")
 
+        img = pygame.image.load("Art/Titelbild.png")
+        img = pygame.transform.scale(img, (self.screenwidth,self.screenheight))
+        self.screen.blit(img,(0,0))
+        myfontbig = pygame.font.SysFont('Comic Sans MS', 50)
+        self.draw_text("Press throttle to begin",int(self.screenwidth/2),int(self.screenheight/3), (255, 0, 0),myfontbig)
+
+        pygame.display.update()
+        while abs(self.get_wheel_angle()[1]-1500) <= 100:
+            pygame.event.get()
+
     def loop(self):
         # get recent image
         cv_image = self.ic.cv_image
@@ -207,8 +217,10 @@ class Game:
 
         pygame.display.update()
 
-    def draw_text(self, text, x, y, color, align_right=False):
-        surface = self.myfont.render(text, True, color, (0, 0, 0))
+    def draw_text(self, text, x, y, color, align_right=False, font = None):
+        if font is None:
+            font = self.myfont
+        surface = font.render(text, True, color, (0, 0, 0))
         surface.set_colorkey((0, 0, 0))
 
         self.screen.blit(surface, (x, y))
