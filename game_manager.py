@@ -70,6 +70,24 @@ class Game:
         while abs(self.get_wheel_angle()[1]-1500) <= 100:
             pygame.event.get()
 
+    def colorize(self, image, newColor):
+        """
+        Create a "colorized" copy of a surface (replaces RGB values with the given color, preserving the per-pixel alphas of
+        original).
+        :param image: Surface to create a colorized copy of
+        :param newColor: RGB color to use (original alpha values are preserved)
+        :return: New colorized Surface instance
+        """
+        image = image.copy()
+
+        # zero out RGB values
+        image.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
+        # add in new RGB values
+        image.fill(newColor[0:3] + (0,), None, pygame.BLEND_RGBA_ADD)
+
+        return image
+>>>>>>> 0784508f14302807fab8391251bb3a3ce29d9260
+
     def loop(self):
         # get recent image
         cv_image = self.ic.cv_image
@@ -102,12 +120,25 @@ class Game:
         frame = np.rot90(frame)
         frame = pygame.surfarray.make_surface(frame)
 
+        #self.colorize(frame, (255, 0, 0))
+
         self.screen.blit(frame, (0, 0))
 
         overlay = pygame.image.load("Art/Overlay.png")
-        overlay = pygame.transform.scale(overlay, (screenwidth, screenheight) )
+        overlay = pygame.transform.scale(overlay, (self.screenwidth, self.screenheight) )
 
         self.screen.blit(overlay , (0,0))
+
+        #print all collected items
+        posy = self.screenheight - 60
+        posx = 50
+        for it in self.car.found:
+            img = pygame.image.load(pic_dict[it.id])
+            x,y = img.get_rect()
+            size = (50*x/y,50)
+            img = pygame.transform.scale(img,size)
+            self.screen.blit(img, (posx,posy))
+            posx += 50*x/y
 
         if marker_found:
             # find center of the marker
