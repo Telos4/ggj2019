@@ -190,14 +190,14 @@ class Game:
                        center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
 
 
-        battery_position = [825, 15]
+        battery_position = [800, 35]
         battery_size = [int(self.car.battery_capacity/100)+20, 70]
         battery_rect = (battery_position[0], battery_position[1], battery_size[0], battery_size[1])
 
         if self.car.battery_charge < self.car.battery_capacity * 0.25:
             battery_color = (255, 0, 0)
         elif self.car.battery_charge < self.car.battery_capacity * 0.5:
-            battery_color = (240, 255, 0)
+            battery_color = (255, 255, 0)
         else:
             battery_color = (0, 255, 0)
 
