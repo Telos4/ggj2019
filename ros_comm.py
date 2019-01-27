@@ -63,8 +63,6 @@ class ROS_communicator:
         parameters = aruco.DetectorParameters_create()
         self.corners, self.ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
         self.marker_found = len(self.corners) > 0
-        if self.marker_found:
-            print(self.ids[0])
 
     def encoder_callback(self, data):
         self.encoder = sum([data.FL, data.FR, data.BL, data.BR])

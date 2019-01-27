@@ -17,10 +17,10 @@ class Marker:
         self.screen = screen
         if self.type == "memory":
             self.sound_length = None
-            self.imgs = [ pygame.image.load(memdir + pic_dict[self.id][0]),pygame.image.load(memdir +pic_dict[self.id][0]) ]
+            self.imgs = [ pygame.image.load(Marker.memdir + pic_dict[self.id][0]),pygame.image.load(Marker.memdir +pic_dict[self.id][1]) ]
         if self.type == "item":
-            self.img = pygame.image.load(itemdir + pic_dict[self.id]) #load images when marker is created to not load it every time -> more fps
-            x,y = img.get_rect().size
+            self.img = pygame.image.load(Marker.itemdir + pic_dict[self.id]) #load images when marker is created to not load it every time -> more fps
+            x,y = self.img.get_rect().size
             size = (50*x/y,50)
             self.img_small = pygame.transform.scale(self.img,size)
 
@@ -41,11 +41,11 @@ class Marker:
                 index = 0 if dummy < 1. * music_transition_dict[self.id] / self.sound_length else 1
                 img = self.imgs[index] #pygame.image.load(pic_dict[self.id][index])
             elif self.type == "item":
-                img = generic_item # pygame.image.load("Art/generic_item_small.png")
+                img = Marker.generic_item # pygame.image.load("Art/generic_item_small.png")
         # ueberblende mit allgemeinem Erinnerungsicon
         else:
             if self.type == "memory":
-                img = generic_mem #pygame.image.load("Art/generic_memory.png")
+                img = Marker.generic_mem #pygame.image.load("Art/generic_memory.png")
             elif self.type == "item":
                 img = self.img #pygame.image.load(pic_dict[self.id])
             elif self.type == "home":

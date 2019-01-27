@@ -234,7 +234,6 @@ class Game:
             rfid_text = self.myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
             self.screen.blit(rfid_text, (260, 700))
             if self.ic.rfid > 0:
-                print(self.ic.rfid)
                 if self.ic.rfid == rfid.sandstorm_id:
                     rfide = rfid.RfidEvent(self.ic.rfid,duration=5,img="Art/Sandstorm.png",screen = self.screen)
                     self.current_rfid_events.append(rfide)
@@ -250,10 +249,8 @@ class Game:
             if t > r.start_time + r.time_duration:
                 r.stop()
                 self.current_rfid_events.remove(r)
-                print("if")
             else:
                 r.event()
-                print("else")
 
         pygame.display.update()
 
