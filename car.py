@@ -25,8 +25,8 @@ class Car:
             except KeyError:
                 sound_file = None
             if sound_file:
-                background_sound = pygame.mixer.Sound(sound_file)
-                mem.sound_length = background_sound.get_length()
-                pygame.mixer.Channel(2).play(sound_file)
+                sound_object = pygame.mixer.Sound(sound_file)
+                mem.sound_length = sound_object.get_length()
+                pygame.mixer.Channel(2).play(sound_object)
 
         mem.event(pos)
