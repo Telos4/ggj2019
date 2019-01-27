@@ -39,12 +39,12 @@ class ROS_communicator:
         self.corners = np.full((0, 0, 0, 0), 1)
         self.ids = []
 
+        self.screen_sizes = screen_sizes
+
         self.encoder_sub = rospy.Subscriber("/encoder", Encoder, self.encoder_callback)
         self.echo_sub = rospy.Subscriber("/echo", Echo, self.echo_callback)
         self.light_sub = rospy.Subscriber("/light", Light, self.light_callback)
         self.rfid_sub = rospy.Subscriber("/rfid", RFID, self.rfid_callback)
-
-        self.screen_sizes = screen_sizes
 
     def callback(self, data):
         try:
