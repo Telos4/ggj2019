@@ -65,12 +65,12 @@ class Game:
         img = pygame.image.load("Art/Titelbild.png")
         img = pygame.transform.scale(img, (self.screenwidth,self.screenheight))
         self.screen.blit(img,(0,0))
-        myfontbig = pygame.font.SysFont('Comic Sans MS', 50)
-        self.draw_text("Press throttle to begin",int(self.screenwidth/2),int(self.screenheight/3), (255, 0, 0),myfontbig)
+        myfontbig = pygame.font.SysFont('Comic Sans MS', 80)
+        self.draw_text("Press throttle to begin",int(self.screenwidth/2)-320,int(self.screenheight/2)+10, (255, 0, 0),myfontbig)
 
         pygame.display.update()
-        #while abs(self.get_wheel_angle()[1]-1500) <= 100:
-        #    pygame.event.get()
+        while abs(self.get_speed()[1]-1500) <= 20:
+            pygame.event.get()
         self.game_start_time = datetime.now()
 
         self.debug_output = True
@@ -279,7 +279,7 @@ class Game:
                 return True
         return False
 
-    def draw_text(self, text, x, y, color, align_right=False, font = None):
+    def draw_text(self, text, x, y, color,  font = None, align_right=False,):
         if font is None:
             font = self.myfont
         surface = font.render(text, True, color, (0, 0, 0))
