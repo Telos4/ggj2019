@@ -67,9 +67,11 @@ class Game:
         self.draw_text("Press throttle to begin",int(self.screenwidth/2),int(self.screenheight/3), (255, 0, 0),myfontbig)
 
         pygame.display.update()
-        while abs(self.get_wheel_angle()[1]-1500) <= 100:
-            pygame.event.get()
+        #while abs(self.get_wheel_angle()[1]-1500) <= 100:
+        #    pygame.event.get()
         self.game_start_time = datetime.now()
+
+        self.debug_output = True
 
     def colorize(self, image, newColor):
         """
@@ -172,7 +174,7 @@ class Game:
 
                 # draw id
                 for m in ml:
-                    if (not m.found) and (m.id != Home_id):
+                    if (not m.found):
                         self.car.event_handler(m ,pos_flipped)
 
         # handle controller input
@@ -182,28 +184,29 @@ class Game:
         wheel_degree = self.get_wheel_degree()
         speed_degree = self.get_speed_degree()
 
-        radius_tacho = 125
-        center_tacho = [1066-radius_tacho, 800]
-        pygame.draw.circle(self.screen, (150, 200, 0), center_tacho, radius_tacho)
-        #pygame.draw.rect(screen, (0, 0, 0), [15, 270, 250, 145])
+        if self.debug_output:
+            radius_tacho = 125
+            center_tacho = [1066-radius_tacho, 800]
+            pygame.draw.circle(self.screen, (150, 200, 0), center_tacho, radius_tacho)
+            #pygame.draw.rect(screen, (0, 0, 0), [15, 270, 250, 145])
 
-        spd_radar = center_tacho
-        spd_radar_len = radius_tacho
-        spd_x = spd_radar[0] + np.cos(np.radians(speed_degree)) * spd_radar_len
-        spd_y = spd_radar[1] + np.sin(np.radians(speed_degree)) * spd_radar_len
-        pygame.draw.line(self.screen, (255, 0, 0), center_tacho, [spd_x, spd_y], 5)
+            spd_radar = center_tacho
+            spd_radar_len = radius_tacho
+            spd_x = spd_radar[0] + np.cos(np.radians(speed_degree)) * spd_radar_len
+            spd_y = spd_radar[1] + np.sin(np.radians(speed_degree)) * spd_radar_len
+            pygame.draw.line(self.screen, (255, 0, 0), center_tacho, [spd_x, spd_y], 5)
 
-        wd_radar = center_tacho
-        wd_radar_len = radius_tacho
-        wd_x = wd_radar[0] + np.cos(np.radians(wheel_degree)) * wd_radar_len
-        wd_y = wd_radar[1] + np.sin(np.radians(wheel_degree)) * wd_radar_len
-        pygame.draw.line(self.screen, (0, 0 ,255), center_tacho, [wd_x, wd_y], 5)
+            wd_radar = center_tacho
+            wd_radar_len = radius_tacho
+            wd_x = wd_radar[0] + np.cos(np.radians(wheel_degree)) * wd_radar_len
+            wd_y = wd_radar[1] + np.sin(np.radians(wheel_degree)) * wd_radar_len
+            pygame.draw.line(self.screen, (0, 0 ,255), center_tacho, [wd_x, wd_y], 5)
 
-        self.draw_text("Speed: {}".format(-int(in_speed * 100)),
-                       center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3, (255, 0, 0))
-        #self.draw_text("Debug Speed: {}".format(int(converted_speed)), center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3 -25, (255, 0, 0))
-        self.draw_text("Steering: {}".format(int(wheel_degree)+90),
-                       center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
+            self.draw_text("Speed: {}".format(-int(in_speed * 100)),
+                          center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3, (255, 0, 0))
+            self.draw_text("Debug Speed: {}".format(int(converted_speed)), center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3 -25, (255, 0, 0))
+            self.draw_text("Steering: {}".format(int(wheel_degree)+90),
+                          center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
 
 
         battery_position = [800, 35]
@@ -231,20 +234,21 @@ class Game:
         # publish command for ros
         self.commands_pub.publish(ECU(converted_speed, converted_wheel_angle))
 
-        # demo how to use sensor values
-        if self.ic.encoder is not None:
-            encoder_text = self.myfont.render("Sum Enc = {}".format(self.ic.encoder), False, (0,0,0))
-            self.screen.blit(encoder_text, (260, 410))
+        if self.debug_output:
+            # demo how to use sensor values
+            if self.ic.encoder is not None:
+                encoder_text = self.myfont.render("Sum Enc = {}".format(self.ic.encoder), False, (0,0,0))
+                self.screen.blit(encoder_text, (260, 410))
 
-        if self.ic.echo is not None:
-            echo_text = self.myfont.render("Echo = {}".format(self.ic.echo), False, (0, 0, 0))
-            self.screen.blit(echo_text, (260, 500))
+            if self.ic.echo is not None:
+                echo_text = self.myfont.render("Echo = {}".format(self.ic.echo), False, (0, 0, 0))
+                self.screen.blit(echo_text, (260, 500))
 
-        if self.ic.light is not None:
-            light_text = self.myfont.render("Light = {}".format(self.ic.light), False, (0, 0, 0))
-            self.screen.blit(light_text, (260, 600))
-            if self.car.charging_possible and self.ic.light > CarConstants.Light_threshold:
-                self.car.battery_charge = min (self.car.battery_charge + 1,self.car.battery_capacity)
+            if self.ic.light is not None:
+                light_text = self.myfont.render("Light = {}".format(self.ic.light), False, (0, 0, 0))
+                self.screen.blit(light_text, (260, 600))
+                if self.car.charging_possible and self.ic.light > CarConstants.Light_threshold:
+                    self.car.battery_charge = min (self.car.battery_charge + 1,self.car.battery_capacity)
 
         if self.ic.rfid is not None:
             rfid_text = self.myfont.render("RFID = {}".format(self.ic.rfid), False, (0, 0, 0))
