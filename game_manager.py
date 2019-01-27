@@ -197,7 +197,7 @@ class Game:
         if self.car.battery_charge < self.car.battery_capacity * 0.25:
             battery_color = (255, 0, 0)
         elif self.car.battery_charge < self.car.battery_capacity * 0.5:
-            battery_color = (150, 150, 0)
+            battery_color = (240, 255, 0)
         else:
             battery_color = (0, 255, 0)
 
