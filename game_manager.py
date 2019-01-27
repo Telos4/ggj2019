@@ -66,9 +66,9 @@ class Game:
         myfontbig = pygame.font.SysFont('Comic Sans MS', 50)
         self.draw_text("Press throttle to begin",int(self.screenwidth/2),int(self.screenheight/3), (255, 0, 0),myfontbig)
 
-        pygame.display.update()
-        while abs(self.get_wheel_angle()[1]-1500) <= 100:
-            pygame.event.get()
+        #pygame.display.update()
+        #while abs(self.get_wheel_angle()[1]-1500) <= 100:
+        #    pygame.event.get()
 
     def colorize(self, image, newColor):
         """
@@ -192,7 +192,7 @@ class Game:
 
         self.draw_text("Speed: {}".format(-int(in_speed * 100)),
                        center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3, (255, 0, 0))
-        self.draw_text("Debug Speed: {}".format(int(converted_speed)), center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3 -25, (255, 0, 0))
+        #self.draw_text("Debug Speed: {}".format(int(converted_speed)), center_tacho[0]- 75, center_tacho[1] - radius_tacho * 1.3 -25, (255, 0, 0))
         self.draw_text("Steering: {}".format(int(wheel_degree)+90),
                        center_tacho[0] - radius_tacho * 2 - 60, center_tacho[1] - 50, (0, 0, 255))
 
@@ -200,6 +200,13 @@ class Game:
         battery_position = [825, 15]
         battery_size = [int(self.car.battery_capacity/100)+20, 70]
         battery_rect = (battery_position[0], battery_position[1], battery_size[0], battery_size[1])
+
+        if self.car.battery_charge < self.car.battery_capacity * 0.25:
+            battery_color = (255, 0, 0)
+        elif self.car.battery_charge < self.car.battery_capacity * 0.5:
+            battery_color = (240, 255, 0)
+        else:
+            battery_color = (0, 255, 0)
 
         nub_size = [15, int(battery_size[1] / 2)]
         nub_rect = (battery_position[0] + battery_size[0], battery_position[1] + int(battery_size[1] / 4), nub_size[0], nub_size[1])
@@ -210,7 +217,7 @@ class Game:
 
         pygame.draw.rect(self.screen, (255, 255, 255), battery_rect, 1)
         pygame.draw.rect(self.screen, (255, 255, 255), nub_rect)
-        pygame.draw.rect(self.screen, (0, 255, 0), charge_rect)
+        pygame.draw.rect(self.screen, battery_color, charge_rect)
 
         # publish command for ros
         self.commands_pub.publish(ECU(converted_speed, converted_wheel_angle))
