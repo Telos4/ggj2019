@@ -74,8 +74,9 @@ on the odroid.
 Also make sure that the correct ports are configures in the launch file _$BARC/workspace/src/barc/launch/game.launch_ on the odroid.
 
 You can now start the ROS programs on the odroid by running
+```
     $ roslaunch barc game.launch
-
+```
 If everything went well, you should be able to see the sensor topics by running:
 ```
     $ rostopic list
