@@ -28,9 +28,9 @@ Hard- and Software are quite involved so installation is a bit tricky. Here we s
 We assume that the BARC project has been set up on the odroid according to the instructions on the [setup website](http://www.barc-project.com/setup/). In addition, ROS (version: Lunar) needs to be installed on the laptop and then the barc package needs to be build and installed as well (refer to the [ROS documentation](http://wiki.ros.org/Documentation) on how to install packages).
 
 ### **Copy source files to odroid:**  
-Let $BARC denote the locations of the barc package (on the laptop and the odroid)
-Copy the files from the _odroid/_ subfolder to the home directory of the odroid (i.e. /home/odroid/).
-In addition, also copy the only the messages from the subfolder _odroid/barc/workspace/src/barc/msg_ to the message folder of the barc package on the laptop, i.e. _$BARC/workspace/src/barc/msg_
+Let $BARC denote the locations of the barc package (on the laptop and the odroid).  
+Copy the files from the _odroid/_ subfolder to the home directory of the odroid (i.e. /home/odroid/).  
+In addition, also copy the only the messages from the subfolder _odroid/barc/workspace/src/barc/msg_ to the message folder of the barc package on the laptop, i.e. _$BARC/workspace/src/barc/msg_.
 
 ### **Build ROS messages:**  
 You now have to include the new messages in the file _$BARC/workspace/src/barc/CMakeLists.txt_ by adding 
@@ -41,7 +41,7 @@ You now have to include the new messages in the file _$BARC/workspace/src/barc/C
 ```
     
 to the command _add\_message\_files( ... )_ (both on the odroid and the laptop).  
-Now build the package again by running the following commands in the _$BARC/workspace folder_ (on the odroid and on the laptop)
+Now build the package again by running the following commands in the _$BARC/workspace_ folder (on the odroid and on the laptop)
 ```
     $ catkin_make . 
     $ catkin_make install
@@ -53,8 +53,8 @@ Now the messages should be build and if you run
 they should appear in the output. 
 
 ### **Arduino setup on the Odroid:**  
-The odroid needs to be connected to two Arduinos. The first Arduino handles communication with car actuators and encoder wheel sensors as described on the [BARC project page](http://www.barc-project.com/setup/).  
-The second Arduino is for reading the light, distance and RFID sensors. You have to connect the sensors and then flash the arduino sketch.  
+The odroid needs to be connected to two arduinos. The first Arduino handles communication with car actuators and encoder wheel sensors as described on the [BARC project page](http://www.barc-project.com/setup/).  
+The second arduino is for reading the light, distance and RFID sensors. You have to connect the sensors and then flash the arduino sketch.  
 The sketch requires headerfiles for the messages you just built. In order to create these, run the following commands on the odroid:
 ```
     $ cd ~/sketchbook/libraries/
@@ -64,7 +64,7 @@ The sketch requires headerfiles for the messages you just built. In order to cre
 For the MFRC522 RFID reader we use a library from [this](https://github.com/miguelbalboa/rfid) Github repository.
 You need to install it by placing the files _MFRC522.h_ and _MFRC522.cpp_ in _~/sketchbook/libraries/MFRC522_.
 
-Now you should be able to flash the second Arduino by using the script provided in the scripts/ subfolder. Just copy the script and run the script
+Now you should be able to flash the second arduino by using the script provided in the scripts/ subfolder. Just copy the script and run the script
 ```
     $ ~/barc/flash_nano_sensors
 ```
