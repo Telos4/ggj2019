@@ -90,7 +90,7 @@ The camera stream can be accessed by:
 ### **Laptop**  
 On the laptop you need to install _Python 2.7_, _pygame_ (at last 1.9.4) and _numpy_. The program uses the libraries _rospy_, _cv2_ and _cv2.aruco_. On my system (Ubuntu 16.04) those were installed automatically when I installed ROS.
 
-##How to run the game:
+## How to run the game:
 Launch game node on odroid: 
 ```
     $ ssh odroid  # log into the odroid
