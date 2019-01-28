@@ -1,5 +1,5 @@
 
-#BRTA – Come Home
+# BRTA – Come Home
 This is our game for **Global Game Jam 2019**.
 
 ![BRTA - Come Home](https://github.com/Telos4/ggj2019/blob/master/Art/Titelbild.png?raw=true)
