@@ -1,8 +1,0 @@
-Launch Camera
--------------
-$ roscore
-$ rosrun cv_camera cv_camera_node
-
-Display image
--------------
-$ rosrun image_view image_view image:=/cv_camera/image_raw _image_transport:=compressed
