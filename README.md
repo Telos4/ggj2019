@@ -82,7 +82,9 @@ If everything went well, you should be able to see the sensor topics by running:
     $ rostopic list
 ```
 and you can display for example the output from the light sensor by:
+```
     $ rostopic echo /light 
+```
 The camera stream can be accessed by:
 ```
     $ rosrun image_view image_view image:=/image_raw _image_transport:= compressed
