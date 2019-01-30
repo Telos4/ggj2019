@@ -25,9 +25,9 @@ You play the game on a laptop that receives the camera and sensor streams from t
 ## Installation instructions:
 Hard- and Software are quite involved so installation is a bit tricky. Here we summarize the main steps.
 
-We assume that the BARC project has been set up on the odroid according to the instructions on the [setup website](http://www.barc-project.com/setup/). In addition, ROS (version: Lunar) needs to be installed on the laptop and then the barc package needs to be build and installed as well (refer to the [ROS documentation](http://wiki.ros.org/Documentation) on how to install packages).
+We assume that the BARC project has been set up on the odroid according to the instructions on the [setup website](http://www.barc-project.com/setup/). In addition, ROS (version: Lunar) needs to be installed on the laptop and then the barc package needs to be built and installed as well (refer to the [ROS documentation](http://wiki.ros.org/Documentation) on how to install packages).
 
-### **Copy source files to odroid:**  
+### **Copy source files:**  
 Let $BARC denote the locations of the barc package (on the laptop and the odroid).  
 Copy the files from the _odroid/_ subfolder to the home directory of the odroid (i.e. /home/odroid/).  
 In addition, also copy the only the messages from the subfolder _odroid/barc/workspace/src/barc/msg_ to the message folder of the barc package on the laptop, i.e. _$BARC/workspace/src/barc/msg_.
@@ -52,7 +52,7 @@ Now the messages should be build and if you run
 ```
 they should appear in the output. 
 
-### **Arduino setup on the Odroid:**  
+### **Arduino setup on the odroid:**  
 The odroid needs to be connected to two arduinos. The first Arduino handles communication with car actuators and encoder wheel sensors as described on the [BARC project page](http://www.barc-project.com/setup/).  
 The second arduino is for reading the light, distance and RFID sensors. You have to connect the sensors and then flash the arduino sketch.  
 The sketch requires headerfiles for the messages you just built. In order to create these, run the following commands on the odroid:
@@ -90,7 +90,7 @@ The camera stream can be accessed by:
     $ rosrun image_view image_view image:=/image_raw _image_transport:= compressed
 ```
 ### **Laptop**  
-On the laptop you need to install _Python 2.7_, _pygame_ (at last 1.9.4) and _numpy_. The program uses the libraries _rospy_, _cv2_ and _cv2.aruco_. On my system (Ubuntu 16.04) those were installed automatically when I installed ROS.
+On the laptop you need to install _Python 2.7_, _pygame_ (at least 1.9.4) and _numpy_. The program uses the libraries _rospy_, _cv2_ and _cv2.aruco_. On my system (Ubuntu 16.04) those were installed automatically when I installed ROS.
 
 ## How to run the game:
 Launch game node on odroid: 
